@@ -205,29 +205,6 @@ export default function NafathVerifyPage() {
         </div>
       )}
 
-      {/* Confirmation Success Modal */}
-      {isConfirmed && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs">
-          <div className="bg-white rounded-2xl p-6 sm:p-8 max-w-md w-full shadow-2xl text-center space-y-4 border border-gray-100">
-            <div className="w-16 h-16 rounded-full bg-[#dfeee3] text-[#129786] flex items-center justify-center mx-auto text-3xl font-bold shadow-sm">
-              ✓
-            </div>
-            <div className="space-y-2">
-              <h3 className="text-xl font-bold text-gray-800">تم تأكيد وتوثيق موعد الفحص بنجاح</h3>
-              <p className="text-xs text-gray-600 leading-relaxed font-medium">
-                تم اعتماد توثيق نفاذ وتثبيت موعد الفحص الفني الدوري بنجاح لدى مركز سلامة والهيئة السعودية للمواصفات والمقاييس والجودة.
-              </p>
-            </div>
-            <button
-              type="button"
-              className="w-full rounded-xl bg-[#129786] hover:bg-[#0e7769] text-white py-3.5 font-bold cursor-pointer transition shadow-md"
-              onClick={() => setLocation("/home")}
-            >
-              العودة للرئيسية
-            </button>
-          </div>
-        </div>
-      )}
     </div>
   );
 }
