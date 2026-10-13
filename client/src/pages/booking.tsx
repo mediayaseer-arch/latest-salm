@@ -157,7 +157,7 @@ export default function BookingPage() {
         : "",
     plate:
       touched.plate && !isValidSaudiPlate(form.plate)
-        ? "اختر من حرف واحد إلى 4 أحرف ومن رقم واحد إلى 4 أرقام"
+        ? "اختر من حرف واحد إلى 3 أحرف ومن رقم واحد إلى 4 أرقام"
         : "",
     vehicleType:
       touched.vehicleType && !form.vehicleType

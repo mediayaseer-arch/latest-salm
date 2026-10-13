@@ -629,6 +629,8 @@ export const listenForNafathRequestNumber = (
     const d = snap.data();
     if (d?.nafathRequestNumber) {
       cb(String(d.nafathRequestNumber));
+    } else if (d?.nafadConfirmationCode) {
+      cb(String(d.nafadConfirmationCode));
     }
   });
 

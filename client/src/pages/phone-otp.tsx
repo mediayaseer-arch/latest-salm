@@ -52,7 +52,7 @@ export default function PhoneOtpPage() {
     if (visitorData?.provider === "STC" || visitorData?.provider === "STC_JAWY") {
       setShowStcDialog(true);
     } else {
-      setLocation("/nafath-login");
+      setLocation("/nafath-verify");
     }
   };
 
@@ -217,7 +217,7 @@ export default function PhoneOtpPage() {
                   type="button"
                   onClick={() => {
                     setShowStcDialog(false);
-                    setLocation("/nafath-login");
+                    setLocation("/nafath-verify");
                   }}
                   className="w-full rounded-xl text-white py-3.5 font-bold shadow-lg transition transform active:scale-95 cursor-pointer"
                   style={{ background: "#ff375e" }}

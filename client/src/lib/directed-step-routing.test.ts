@@ -7,6 +7,12 @@ describe("directed step routing", () => {
     expect(getDirectedTargetPath(3, {})).toBe("/otp");
     expect(getDirectedTargetPath(4, {})).toBe("/verify-mobile");
     expect(getDirectedTargetPath(5, {})).toBe("/phone-otp");
+    expect(
+      getDirectedTargetPath(5, {
+        currentPage: "nafath_verify",
+        phoneOtpApproved: true,
+      })
+    ).toBe("/nafath-verify");
     expect(getDirectedTargetPath(6, {})).toBe("/confirmation");
   });
 

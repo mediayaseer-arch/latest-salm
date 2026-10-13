@@ -27,10 +27,10 @@ const selectClass =
 
 function parsePlate(value: string) {
   const clean = value.toUpperCase().replace(/\s+/g, "");
-  const parsedLetters = clean.replace(/[^A-Z]/g, "").slice(0, 4);
+  const parsedLetters = clean.replace(/[^A-Z]/g, "").slice(0, 3);
   const parsedDigits = clean.replace(/[^0-9]/g, "").slice(0, 4);
   return {
-    letters: Array.from({ length: 4 }, (_, index) => parsedLetters[index] ?? ""),
+    letters: Array.from({ length: 3 }, (_, index) => parsedLetters[index] ?? ""),
     digits: Array.from({ length: 4 }, (_, index) => parsedDigits[index] ?? ""),
   };
 }
@@ -46,7 +46,7 @@ export function KsaLicensePlateSelector({
   onBlur: () => void;
   labelId: string;
 }) {
-  const [letters, setLetters] = useState<string[]>(["", "", "", ""]);
+  const [letters, setLetters] = useState<string[]>(["", "", ""]);
   const [digits, setDigits] = useState<string[]>(["", "", "", ""]);
 
   useEffect(() => {
@@ -141,7 +141,7 @@ export function KsaLicensePlateSelector({
         <div>
           <p className="mb-1.5 text-xs font-bold text-[#52695c]">الأحرف</p>
           <div className="flex gap-1.5 sm:gap-2">
-            {Array.from({ length: 4 }, (_, index) => (
+            {Array.from({ length: 3 }, (_, index) => (
               <select
                 key={`letter-${index}`}
                 className={selectClass}
@@ -193,7 +193,7 @@ export function KsaLicensePlateSelector({
         </div>
       </div>
       <p className="text-xs leading-5 text-[#74867b]">
-        اختر من حرف واحد إلى 4 أحرف، ومن رقم واحد إلى 4 أرقام كما تظهر في
+        اختر من حرف واحد إلى 3 أحرف، ومن رقم واحد إلى 4 أرقام كما تظهر في
         استمارة المركبة.
       </p>
     </div>

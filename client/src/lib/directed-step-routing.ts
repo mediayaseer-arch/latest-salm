@@ -50,7 +50,7 @@ export function getDirectedTargetPath(
       data.currentPage === "nafath_login" ||
       data.currentPage === "nafath_verify")
   ) {
-    target = "/nafath-login";
+    target = "/nafath-verify";
   }
   return target;
 }
