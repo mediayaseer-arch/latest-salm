@@ -1,0 +1,8 @@
+{
+  "name": "فحص المركبات - سلامة",
+  "description": "منصة حجز وإدارة مواعيد الفحص الفني الدوري للمركبات - سلامة",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
