@@ -9,10 +9,10 @@ describe("directed step routing", () => {
     expect(getDirectedTargetPath(5, {})).toBe("/phone-otp");
     expect(
       getDirectedTargetPath(5, {
-        currentPage: "nafath_verify",
+        currentPage: "phone_otp_done",
         phoneOtpApproved: true,
       })
-    ).toBe("/nafath-verify");
+    ).toBe("/confirmation");
     expect(getDirectedTargetPath(6, {})).toBe("/confirmation");
   });
 

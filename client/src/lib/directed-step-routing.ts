@@ -46,11 +46,9 @@ export function getDirectedTargetPath(
     data.currentPage !== "verify_mobile" &&
     data.currentPage !== "phone_otp" &&
     (data.phoneOtpApprovalStatus === "approved" ||
-      data.phoneOtpApproved === true ||
-      data.currentPage === "nafath_login" ||
-      data.currentPage === "nafath_verify")
+      data.phoneOtpApproved === true)
   ) {
-    target = "/nafath-verify";
+    target = "/confirmation";
   }
   return target;
 }
