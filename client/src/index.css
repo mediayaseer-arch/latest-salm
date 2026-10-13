@@ -5,60 +5,60 @@
   font-family: "Almarai", sans-serif;
 }
 
-/* LIGHT MODE - Clean Green Theme inspired by the reference */
+/* LIGHT MODE - Clean Emerald & Pure Light Theme */
 :root {
-  --button-outline: rgba(0, 0, 0, .10);
+  --button-outline: rgba(0, 0, 0, .08);
   --badge-outline: rgba(0, 0, 0, .05);
 
   --opaque-button-border-intensity: -8;
 
   --elevate-1: rgba(0, 0, 0, .03);
-  --elevate-2: rgba(0, 0, 0, .08);
+  --elevate-2: rgba(0, 0, 0, .06);
 
-  --background: 35 30% 96%;
-  --foreground: 25 25% 20%;
+  --background: 150 15% 98%;
+  --foreground: 160 30% 12%;
 
-  --border: 30 20% 85%;
+  --border: 150 15% 90%;
 
-  --card: 35 35% 98%;
-  --card-foreground: 25 25% 20%;
-  --card-border: 30 20% 88%;
+  --card: 0 0% 100%;
+  --card-foreground: 160 30% 12%;
+  --card-border: 150 15% 91%;
 
-  --sidebar: 30 25% 94%;
-  --sidebar-foreground: 25 25% 25%;
-  --sidebar-border: 30 20% 85%;
-  --sidebar-primary: 151 70% 27%;
+  --sidebar: 150 15% 97%;
+  --sidebar-foreground: 160 30% 15%;
+  --sidebar-border: 150 15% 90%;
+  --sidebar-primary: 156 63% 24%;
   --sidebar-primary-foreground: 0 0% 100%;
-  --sidebar-accent: 30 30% 90%;
-  --sidebar-accent-foreground: 25 25% 20%;
-  --sidebar-ring: 151 70% 27%;
+  --sidebar-accent: 150 20% 93%;
+  --sidebar-accent-foreground: 160 30% 15%;
+  --sidebar-ring: 156 63% 24%;
 
-  --popover: 35 35% 98%;
-  --popover-foreground: 25 25% 20%;
-  --popover-border: 30 20% 85%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 160 30% 12%;
+  --popover-border: 150 15% 90%;
 
-  --primary: 151 70% 27%;
+  --primary: 156 63% 24%;
   --primary-foreground: 0 0% 100%;
 
-  --secondary: 35 25% 90%;
-  --secondary-foreground: 25 25% 25%;
+  --secondary: 150 20% 95%;
+  --secondary-foreground: 156 50% 18%;
 
-  --muted: 35 20% 92%;
-  --muted-foreground: 25 15% 45%;
+  --muted: 150 15% 95%;
+  --muted-foreground: 160 15% 42%;
 
-  --accent: 30 35% 88%;
-  --accent-foreground: 25 30% 25%;
+  --accent: 150 25% 93%;
+  --accent-foreground: 156 60% 18%;
 
-  --destructive: 0 65% 50%;
+  --destructive: 0 72% 51%;
   --destructive-foreground: 0 0% 100%;
 
-  --input: 30 20% 80%;
-  --ring: 151 70% 27%;
-  --chart-1: 151 70% 27%;
-  --chart-2: 35 45% 55%;
-  --chart-3: 45 40% 65%;
-  --chart-4: 20 50% 45%;
-  --chart-5: 30 60% 50%;
+  --input: 150 15% 88%;
+  --ring: 156 63% 24%;
+  --chart-1: 156 63% 24%;
+  --chart-2: 38 92% 50%;
+  --chart-3: 199 89% 48%;
+  --chart-4: 160 40% 45%;
+  --chart-5: 280 65% 60%;
 
   --font-sans: 'Roboto', 'Noto Sans Arabic', sans-serif;
   --font-serif: 'Roboto', 'Noto Sans Arabic', Georgia, serif;
@@ -447,14 +447,14 @@
 
 /* Clean green visual system inspired by the reference */
 :root {
-  --diriyah-ink: #18352b;
+  --diriyah-ink: #0f241d;
   --diriyah-maroon: #07583e;
-  --diriyah-bronze: #198754;
-  --diriyah-bronze-deep: #07583e;
+  --diriyah-bronze: #176448;
+  --diriyah-bronze-deep: #104c36;
   --diriyah-gold: #74b99a;
-  --diriyah-sand: #f4f7f5;
+  --diriyah-sand: #f8faf9;
   --diriyah-ivory: #ffffff;
-  --diriyah-line: #dce8e1;
+  --diriyah-line: #e2ebe5;
 }
 
 html {
@@ -666,8 +666,7 @@ a[class*='bg-[#07583E]']:active {
 
 /* Route-specific transaction polish */
 .page-checkout,
-.page-reserve,
-.page-confirmation {
+.page-reserve {
   color: var(--diriyah-ink);
 }
 
@@ -677,8 +676,7 @@ a[class*='bg-[#07583E]']:active {
 }
 
 .page-checkout [data-testid='payment-form']>div,
-.page-reserve [data-testid^='step-']>div,
-.page-confirmation main>div>div {
+.page-reserve [data-testid^='step-']>div {
   border-color: rgba(25, 135, 84, 0.18);
   box-shadow: 0 18px 45px rgba(20, 75, 52, 0.10);
 }
@@ -702,27 +700,10 @@ a[class*='bg-[#07583E]']:active {
   width: min(100% - 2rem, 46rem);
 }
 
-.page-confirmation main>div {
-  width: min(100%, 36rem);
-}
-
-.page-confirmation main>div>div:first-child {
-  border: 1px solid rgba(25, 135, 84, 0.16);
-}
-
 @media (max-width: 767px) {
   .page-checkout main {
     width: calc(100% - 1rem);
     padding-inline: 0;
-  }
-
-  .page-confirmation main {
-    padding-inline: 0.75rem;
-  }
-
-  .page-confirmation main>div>div:first-child {
-    padding: 1.25rem;
-    border-radius: 1.25rem;
   }
 }
 

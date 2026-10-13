@@ -79,7 +79,6 @@ export function registerRoutes(
       "Disallow: /booking",
       "Disallow: /checkout",
       "Disallow: /otp",
-      "Disallow: /confirmation",
       `Sitemap: ${origin}/sitemap.xml`,
       "",
     ].join("\n"));

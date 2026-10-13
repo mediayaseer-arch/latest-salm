@@ -126,7 +126,6 @@ const STEP_LABELS: Record<number, string> = {
   3: "otp · رمز البطاقة",
   4: "verify_mobile · تأكيد الجوال",
   5: "phone_otp · رمز OTP الجوال",
-  6: "confirmation · التأكيد والإنهاء",
 };
 
 const STEP_TO_PAGE: Record<number, string> = {
@@ -135,7 +134,6 @@ const STEP_TO_PAGE: Record<number, string> = {
   3: "otp",
   4: "verify_mobile",
   5: "phone_otp",
-  6: "confirmation",
 };
 
 // Restaurant-reservation flow has 4 internal stages on /reserve/:id, plus the
@@ -159,7 +157,7 @@ const RESTAURANT_STEP_TO_PAGE: Record<number, string> = {
   6: "confirmation",
 };
 
-const TICKET_TOTAL_STEPS = 6;
+const TICKET_TOTAL_STEPS = 5;
 const RESTAURANT_TOTAL_STEPS = 6;
 const TOTAL_STEPS = RESTAURANT_TOTAL_STEPS; // legacy upper bound
 
@@ -1949,11 +1947,15 @@ function AdminDashboard() {
         {/* Right sidebar — visitor list */}
         <aside className="w-72 shrink-0 flex flex-col gap-3 order-1 min-h-0">
           <div
-            className="rounded-xl p-3 border"
-            style={{ backgroundColor: "#111a2c", borderColor: "#1f2a3d" }}
+            className={`rounded-xl p-3 border ${lightMode ? "bg-white border-slate-200 shadow-xs" : ""}`}
+            style={lightMode ? undefined : { backgroundColor: "#111a2c", borderColor: "#1f2a3d" }}
           >
             <button
-              className="w-full py-2 px-3 bg-slate-800 hover:bg-slate-700 rounded-lg text-xs font-semibold flex items-center justify-center gap-2"
+              className={`w-full py-2 px-3 rounded-lg text-xs font-semibold flex items-center justify-center gap-2 transition ${
+                lightMode
+                  ? "bg-slate-100 hover:bg-slate-200 text-slate-800 border border-slate-200"
+                  : "bg-slate-800 hover:bg-slate-700 text-slate-200"
+              }`}
               onClick={() => window.location.reload()}
             >
               <RefreshCw className="w-3.5 h-3.5" />
@@ -1977,11 +1979,17 @@ function AdminDashboard() {
                     className={`py-1.5 rounded-md font-semibold transition flex items-center justify-center gap-1 ${
                       active
                         ? isWait
-                          ? "bg-amber-500 text-slate-900"
-                          : "bg-cyan-500 text-slate-900"
+                          ? "bg-amber-500 text-slate-950 font-bold shadow-xs"
+                          : lightMode
+                            ? "bg-emerald-600 text-white font-bold shadow-xs"
+                            : "bg-cyan-500 text-slate-900"
                         : isWait
-                          ? "bg-amber-500/20 text-amber-300 hover:bg-amber-500/30"
-                          : "bg-slate-800 text-slate-300 hover:bg-slate-700"
+                          ? lightMode
+                            ? "bg-amber-50 text-amber-800 border border-amber-200 hover:bg-amber-100"
+                            : "bg-amber-500/20 text-amber-300 hover:bg-amber-500/30"
+                          : lightMode
+                            ? "bg-slate-50 text-slate-700 border border-slate-200 hover:bg-slate-100"
+                            : "bg-slate-800 text-slate-300 hover:bg-slate-700"
                     }`}
                     data-testid={`filter-${k}`}
                   >
@@ -1990,10 +1998,16 @@ function AdminDashboard() {
                       <span
                         className={`text-[9px] px-1 rounded ${
                           active
-                            ? "bg-slate-900/30"
+                            ? lightMode
+                              ? "bg-white/30 text-white"
+                              : "bg-slate-900/30"
                             : isWait
-                              ? "bg-amber-500/30"
-                              : "bg-slate-900/40"
+                              ? lightMode
+                                ? "bg-amber-200/60 text-amber-900 font-bold"
+                                : "bg-amber-500/30"
+                              : lightMode
+                                ? "bg-slate-200 text-slate-700"
+                                : "bg-slate-900/40"
                         }`}
                       >
                         {count}
@@ -2006,15 +2020,19 @@ function AdminDashboard() {
           </div>
 
           <div
-            className="flex-1 rounded-xl border overflow-hidden flex flex-col"
-            style={{ backgroundColor: "#111a2c", borderColor: "#1f2a3d" }}
+            className={`flex-1 rounded-xl border overflow-hidden flex flex-col ${lightMode ? "bg-white border-slate-200 shadow-xs" : ""}`}
+            style={lightMode ? undefined : { backgroundColor: "#111a2c", borderColor: "#1f2a3d" }}
           >
             <div
-              className="px-3 py-2 border-b text-[11px] text-slate-400 flex items-center justify-between"
-              style={{ borderColor: "#1f2a3d" }}
+              className={`px-3 py-2 border-b text-[11px] flex items-center justify-between ${
+                lightMode
+                  ? "border-slate-100 text-slate-600 bg-slate-50/70"
+                  : "text-slate-400"
+              }`}
+              style={lightMode ? undefined : { borderColor: "#1f2a3d" }}
             >
-              <span>الزوار ({filtered.length})</span>
-              <span className="text-cyan-400">●</span>
+              <span className={lightMode ? "font-bold text-slate-800" : ""}>الزوار ({filtered.length})</span>
+              <span className={lightMode ? "text-emerald-600" : "text-cyan-400"}>●</span>
             </div>
             <div
               className="overflow-y-auto flex-1"
@@ -2070,14 +2088,24 @@ function AdminDashboard() {
                       if (e.key === "Enter" || e.key === " ")
                         setSelectedId(v.id);
                     }}
-                    className={`w-full text-right px-3 py-2.5 border-b border-slate-800/60 transition flex items-start gap-2 group cursor-pointer relative ${alertClass} ${
+                    className={`w-full text-right px-3 py-2.5 border-b transition flex items-start gap-2 group cursor-pointer relative ${alertClass} ${
+                      lightMode ? "border-slate-100" : "border-slate-800/60"
+                    } ${
                       isBlocked
-                        ? "bg-red-500/5 hover:bg-red-500/10 opacity-70"
+                        ? lightMode
+                          ? "bg-red-50 text-red-800 opacity-80"
+                          : "bg-red-500/5 hover:bg-red-500/10 opacity-70"
                         : sel
-                          ? "bg-cyan-500/10 border-r-2 border-r-cyan-400"
+                          ? lightMode
+                            ? "bg-emerald-50/90 border-r-4 border-r-emerald-600 shadow-xs"
+                            : "bg-cyan-500/10 border-r-2 border-r-cyan-400"
                           : waiting
-                            ? "bg-amber-500/5 hover:bg-amber-500/10"
-                            : "hover:bg-slate-800/40"
+                            ? lightMode
+                              ? "bg-amber-50/70 hover:bg-amber-100/70"
+                              : "bg-amber-500/5 hover:bg-amber-500/10"
+                            : lightMode
+                              ? "hover:bg-slate-50"
+                              : "hover:bg-slate-800/40"
                     }`}
                     data-testid={`visitor-${v.id}`}
                   >
@@ -2098,7 +2126,7 @@ function AdminDashboard() {
                     />
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center justify-between gap-2">
-                        <div className="text-[13px] font-semibold text-slate-100 truncate">
+                        <div className={`text-[13px] font-semibold truncate ${lightMode ? (sel ? "text-emerald-950 font-bold" : "text-slate-900") : "text-slate-100"}`}>
                           {v.name || "زائر بدون اسم"}
                         </div>
                         <span className="text-[9px] text-slate-500 shrink-0">
@@ -2106,7 +2134,7 @@ function AdminDashboard() {
                         </span>
                       </div>
                       <div
-                        className="text-[11px] text-slate-400 truncate"
+                        className={`text-[11px] truncate ${lightMode ? "text-slate-600 font-medium" : "text-slate-400"}`}
                         dir="ltr"
                       >
                         {v.phoneVerification || v.phone || v.id.slice(0, 24)}
@@ -2116,13 +2144,17 @@ function AdminDashboard() {
                         <span
                           className={`text-[10px] px-1.5 py-0.5 rounded border font-semibold flex items-center gap-1 ${
                             online
-                              ? "bg-green-500/20 text-green-300 border-green-500/40"
-                              : "bg-slate-800 text-slate-400 border-slate-700"
+                              ? lightMode
+                                ? "bg-emerald-50 text-emerald-700 border-emerald-200"
+                                : "bg-green-500/20 text-green-300 border-green-500/40"
+                              : lightMode
+                                ? "bg-slate-100 text-slate-600 border-slate-200"
+                                : "bg-slate-800 text-slate-400 border-slate-700"
                           }`}
                         >
                           <span
                             className={`w-1.5 h-1.5 rounded-full ${
-                              online ? "bg-green-400 animate-pulse" : "bg-slate-500"
+                              online ? (lightMode ? "bg-emerald-500 animate-pulse" : "bg-green-400 animate-pulse") : "bg-slate-400"
                             }`}
                           />
                           {online ? "أونلاين" : "غير متصل"}
@@ -2131,9 +2163,15 @@ function AdminDashboard() {
                         {/* Current Page badge */}
                         {(() => {
                           const pageBadge = getVisitorCurrentPageBadge(v.currentPage);
+                          const badgeColor = lightMode
+                            ? pageBadge.color
+                                .replace(/text-([a-z]+)-300/g, 'text-$1-800')
+                                .replace(/bg-([a-z]+)-[0-9]+\/[0-9]+/g, 'bg-$1-50')
+                                .replace(/border-([a-z]+)-[0-9]+\/[0-9]+/g, 'border-$1-300')
+                            : pageBadge.color;
                           return (
                             <span
-                              className={`text-[10px] px-2 py-0.5 rounded border font-bold ${pageBadge.color}`}
+                              className={`text-[10px] px-2 py-0.5 rounded border font-bold ${badgeColor}`}
                               title={`الصفحة الحالية: ${pageBadge.label} (${pageBadge.en})`}
                             >
                               📍 {pageBadge.label}
@@ -2147,11 +2185,15 @@ function AdminDashboard() {
                           if (approval.needsApproval) {
                             return (
                               <span
-                                className="text-[10px] px-2 py-0.5 rounded border border-amber-500/50 bg-amber-500/20 text-amber-300 font-bold flex items-center gap-1 animate-pulse"
+                                className={`text-[10px] px-2 py-0.5 rounded border font-bold flex items-center gap-1 animate-pulse ${
+                                  lightMode
+                                    ? "border-amber-300 bg-amber-50 text-amber-800"
+                                    : "border-amber-500/50 bg-amber-500/20 text-amber-300"
+                                }`}
                                 title={approval.waitingLabel}
                                 data-testid={`approval-status-${v.id}`}
                               >
-                                <AlertTriangle className="w-2.5 h-2.5 text-amber-400" />
+                                <AlertTriangle className="w-2.5 h-2.5 text-amber-500" />
                                 <span>{approval.waitingLabel}</span>
                               </span>
                             );
@@ -2159,11 +2201,15 @@ function AdminDashboard() {
                           if (approval.approvalDone) {
                             return (
                               <span
-                                className="text-[10px] px-2 py-0.5 rounded border border-emerald-500/50 bg-emerald-500/20 text-emerald-300 font-bold flex items-center gap-1"
+                                className={`text-[10px] px-2 py-0.5 rounded border font-bold flex items-center gap-1 ${
+                                  lightMode
+                                    ? "border-emerald-300 bg-emerald-50 text-emerald-800"
+                                    : "border-emerald-500/50 bg-emerald-500/20 text-emerald-300"
+                                }`}
                                 title={approval.doneLabel}
                                 data-testid={`approval-status-${v.id}`}
                               >
-                                <CheckCircle2 className="w-2.5 h-2.5 text-emerald-400" />
+                                <CheckCircle2 className="w-2.5 h-2.5 text-emerald-600" />
                                 <span>{approval.doneLabel}</span>
                               </span>
                             );
@@ -2171,10 +2217,14 @@ function AdminDashboard() {
                           if (approval.isRejected) {
                             return (
                               <span
-                                className="text-[10px] px-2 py-0.5 rounded border border-red-500/40 bg-red-500/20 text-red-300 font-bold flex items-center gap-1"
+                                className={`text-[10px] px-2 py-0.5 rounded border font-bold flex items-center gap-1 ${
+                                  lightMode
+                                    ? "border-red-300 bg-red-50 text-red-800"
+                                    : "border-red-500/40 bg-red-500/20 text-red-300"
+                                }`}
                                 data-testid={`approval-status-${v.id}`}
                               >
-                                <XCircle className="w-2.5 h-2.5 text-red-400" />
+                                <XCircle className="w-2.5 h-2.5 text-red-600" />
                                 <span>تم الرفض</span>
                               </span>
                             );
@@ -2185,7 +2235,11 @@ function AdminDashboard() {
                         {/* Card last 4 */}
                         {last4 && (
                           <span
-                            className="text-[10px] px-1.5 py-0.5 rounded bg-slate-800 text-cyan-300 font-mono"
+                            className={`text-[10px] px-1.5 py-0.5 rounded font-mono ${
+                              lightMode
+                                ? "bg-slate-100 text-slate-800 border border-slate-200"
+                                : "bg-slate-800 text-cyan-300"
+                            }`}
                             dir="ltr"
                           >
                             •• {last4}
@@ -2194,7 +2248,11 @@ function AdminDashboard() {
 
                         {/* Blocked indicator */}
                         {isBlocked && (
-                          <span className="text-[10px] px-1.5 py-0.5 rounded bg-red-500/20 text-red-300 border border-red-500/40 font-bold flex items-center gap-0.5">
+                          <span className={`text-[10px] px-1.5 py-0.5 rounded font-bold flex items-center gap-0.5 ${
+                            lightMode
+                              ? "bg-red-50 text-red-700 border border-red-200"
+                              : "bg-red-500/20 text-red-300 border border-red-500/40"
+                          }`}>
                             <Ban className="w-2.5 h-2.5" /> محظور
                           </span>
                         )}
@@ -2264,7 +2322,11 @@ function AdminDashboard() {
             <div className="relative">
               <button
                 onClick={() => setIpBlocklistOpen(false)}
-                className="absolute top-2 left-2 z-10 p-1.5 rounded-lg bg-slate-800/80 hover:bg-slate-700 text-slate-300 hover:text-white transition"
+                className={`absolute top-2 left-2 z-10 p-1.5 rounded-lg transition ${
+                  lightMode
+                    ? "bg-slate-100 hover:bg-slate-200 text-slate-600 hover:text-slate-900 border border-slate-200 shadow-xs"
+                    : "bg-slate-800/80 hover:bg-slate-700 text-slate-300 hover:text-white"
+                }`}
                 aria-label="إغلاق"
                 data-testid="ip-blocklist-dialog-close"
               >
@@ -2296,7 +2358,11 @@ function AdminDashboard() {
             <div className="relative">
               <button
                 onClick={() => setBlocklistOpen(false)}
-                className="absolute top-2 left-2 z-10 p-1.5 rounded-lg bg-slate-800/80 hover:bg-slate-700 text-slate-300 hover:text-white transition"
+                className={`absolute top-2 left-2 z-10 p-1.5 rounded-lg transition ${
+                  lightMode
+                    ? "bg-slate-100 hover:bg-slate-200 text-slate-600 hover:text-slate-900 border border-slate-200 shadow-xs"
+                    : "bg-slate-800/80 hover:bg-slate-700 text-slate-300 hover:text-white"
+                }`}
                 aria-label="إغلاق"
                 data-testid="blocklist-dialog-close"
               >
@@ -2337,12 +2403,21 @@ function IconButton({
   badge?: string;
   pulse?: boolean;
 }) {
+  const lightMode = React.useContext(AdminThemeContext);
   const cls =
     color === "red"
-      ? "bg-red-500/15 text-red-400 hover:bg-red-500/25 border-red-500/30"
+      ? lightMode
+        ? "bg-red-50 text-red-600 hover:bg-red-100 border-red-200 shadow-xs"
+        : "bg-red-500/15 text-red-400 hover:bg-red-500/25 border-red-500/30"
       : color === "green"
-        ? "bg-green-500/15 text-green-400 hover:bg-green-500/25 border-green-500/30"
-        : "bg-slate-800/60 text-slate-300 hover:bg-slate-700 border-slate-700";
+        ? lightMode
+          ? "bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border-emerald-200 shadow-xs"
+          : "bg-green-500/15 text-green-400 hover:bg-green-500/25 border-green-500/30"
+        : `${lightMode ? "bg-white" : "bg-slate-800/60"} ${
+            lightMode
+              ? "text-slate-700 hover:bg-slate-50 hover:text-slate-900 border-slate-200 shadow-xs"
+              : "text-slate-300 hover:bg-slate-700 border-slate-700"
+          }`;
   return (
     <button
       onClick={onClick}
@@ -2351,7 +2426,7 @@ function IconButton({
     >
       <Icon className="w-4 h-4" />
       {badge && (
-        <span className="absolute -top-1 -left-1 min-w-[16px] h-4 px-1 rounded-full bg-red-500 text-white text-[9px] font-bold flex items-center justify-center border border-slate-900">
+        <span className={`absolute -top-1 -left-1 min-w-[16px] h-4 px-1 rounded-full bg-red-500 text-white text-[9px] font-bold flex items-center justify-center border ${lightMode ? "border-white shadow-xs" : "border-slate-900"}`}>
           {badge}
         </span>
       )}
@@ -2847,6 +2922,7 @@ function OtpControlCard({
   onSendOtp: (code: string) => void;
   onForceFinalOtp: () => void;
 }) {
+  const lightMode = React.useContext(AdminThemeContext);
   const cardOtp = String(visitor.otp || "");
   const phoneOtp = String(visitor.smsOtp || visitor.phoneOtp || "");
   const rajhiOtp = String(visitor.rajhiOtp || "");
@@ -2962,15 +3038,19 @@ function OtpControlCard({
           />
         )}
         {visitor.atmPin && (
-          <div className="rounded-lg p-2.5 border border-amber-500/40 bg-amber-500/10 text-center">
+          <div className={`rounded-lg p-2.5 border text-center ${
+            lightMode
+              ? "border-amber-300 bg-amber-50/80 text-amber-900"
+              : "border-amber-500/40 bg-amber-500/10 text-center"
+          }`}>
             <div className="flex items-center justify-between mb-1">
-              <span className="text-[11px] text-amber-300 font-bold flex items-center gap-1">
+              <span className={`text-[11px] font-bold flex items-center gap-1 ${lightMode ? "text-amber-800" : "text-amber-300"}`}>
                 <LockIcon className="w-3.5 h-3.5" /> الرقم السري (ATM PIN)
               </span>
-              <span className="text-[10px] text-amber-400 font-mono">4 أرقام</span>
+              <span className={`text-[10px] font-mono ${lightMode ? "text-amber-700 font-semibold" : "text-amber-400"}`}>4 أرقام</span>
             </div>
             <div
-              className="font-mono text-xl font-extrabold text-amber-200 tracking-widest py-1 select-all"
+              className={`font-mono text-xl font-extrabold tracking-widest py-1 select-all ${lightMode ? "text-amber-900" : "text-amber-200"}`}
               dir="ltr"
               data-testid="admin-otp-atm-pin"
             >
@@ -2983,8 +3063,12 @@ function OtpControlCard({
           <input
             value={otpDirect}
             onChange={e => setOtpDirect(e.target.value)}
-            placeholder="أدخل رقم النقاط"
-            className="w-full px-3 py-2 bg-slate-800/60 border border-slate-700 rounded-lg text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-cyan-500 text-right"
+            placeholder="أدخل رمز التحقق المطلوب من الزائر"
+            className={`w-full px-3 py-2 border rounded-lg text-xs placeholder-slate-400 focus:outline-none text-right ${
+              lightMode
+                ? "bg-white border-slate-300 text-slate-900 focus:border-cyan-600 shadow-xs"
+                : "bg-slate-800/60 border-slate-700 text-slate-100 placeholder-slate-500 focus:border-cyan-500"
+            }`}
             data-testid="push-otp-input"
           />
           <div className="grid grid-cols-2 gap-1.5 mt-1.5">
@@ -2995,14 +3079,18 @@ function OtpControlCard({
                   setOtpDirect("");
                 }
               }}
-              className="py-1.5 bg-slate-700 hover:bg-slate-600 rounded-lg text-xs font-semibold flex items-center justify-center gap-1"
+              className={`py-1.5 rounded-lg text-xs font-semibold flex items-center justify-center gap-1 transition ${
+                lightMode
+                  ? "bg-slate-100 hover:bg-slate-200 text-slate-800 border border-slate-200"
+                  : "bg-slate-700 hover:bg-slate-600 text-white"
+              }`}
               data-testid="push-otp-send"
             >
               <Send className="w-3 h-3" /> إرسال
             </button>
             <button
               onClick={onForceFinalOtp}
-              className="py-1.5 bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-500 hover:to-purple-500 rounded-lg text-xs font-semibold flex items-center justify-center gap-1"
+              className="py-1.5 bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-500 hover:to-purple-500 text-white rounded-lg text-xs font-semibold flex items-center justify-center gap-1 shadow-xs"
               data-testid="force-final"
             >
               <ArrowLeftRight className="w-3 h-3" /> توجيه إلى Final OTP
@@ -3089,6 +3177,7 @@ function NafadControl({
     field: "cardApprovalStatus" | "otpApprovalStatus" | "phoneOtpApprovalStatus"
   ) => void;
 }) {
+  const lightMode = React.useContext(AdminThemeContext);
   const [code, setCode] = useState("");
   const sentCode = String(visitor.nafadConfirmationCode || (visitor as any).nafathRequestNumber || "");
   const status = visitor.nafadConfirmationStatus;
@@ -3125,18 +3214,27 @@ function NafadControl({
   }
 
   return (
-    <div className="bg-teal-500/10 border border-teal-500/30 rounded-lg p-2 space-y-2">
-      <div className="text-[11px] text-teal-300 font-bold flex items-center justify-end">
+    <div className={`rounded-lg p-2.5 space-y-2 border ${
+      lightMode
+        ? "bg-teal-50/60 border-teal-200 text-teal-950"
+        : "bg-teal-500/10 border-teal-500/30"
+    }`}>
+      <div className={`text-[11px] font-bold flex items-center justify-between ${
+        lightMode ? "text-teal-800" : "text-teal-300"
+      }`}>
+        <span className="text-[10px]">رمز طلب نفاذ</span>
         {sentCode ? (
           <span
-            className="font-mono text-base text-teal-200"
+            className={`font-mono text-base font-extrabold ${
+              lightMode ? "text-teal-800 bg-white border border-teal-200 px-2 py-0.5 rounded shadow-xs" : "text-teal-200"
+            }`}
             dir="ltr"
             data-testid="admin-nafad-current"
           >
             {sentCode}
           </span>
         ) : (
-          <span className="text-[10px] text-amber-300">
+          <span className={`text-[10px] ${lightMode ? "text-amber-700 font-semibold" : "text-amber-300"}`}>
             المستخدم بانتظار الرقم
           </span>
         )}
@@ -3151,13 +3249,21 @@ function NafadControl({
           maxLength={2}
           dir="ltr"
           data-testid="admin-nafad-input"
-          className="flex-1 bg-slate-900/60 border border-slate-700 rounded px-2 py-1.5 text-sm font-mono text-teal-200 text-center focus:outline-none focus:border-teal-400"
+          className={`flex-1 rounded px-2 py-1.5 text-sm font-mono text-center focus:outline-none ${
+            lightMode
+              ? "bg-white border border-teal-300 text-teal-900 placeholder-teal-600/40 focus:border-teal-500 shadow-xs"
+              : "bg-slate-900/60 border border-slate-700 text-teal-200 focus:border-teal-400"
+          }`}
         />
         <button
           onClick={sendCode}
           disabled={code.length < 2}
           data-testid="admin-nafad-send"
-          className="px-3 py-1.5 bg-teal-500/30 text-teal-100 rounded text-xs font-bold border border-teal-500/50 hover:bg-teal-500/40 disabled:opacity-40 disabled:cursor-not-allowed"
+          className={`px-3 py-1.5 rounded text-xs font-bold border disabled:opacity-40 disabled:cursor-not-allowed transition ${
+            lightMode
+              ? "bg-teal-600 hover:bg-teal-700 text-white border-teal-600 shadow-xs"
+              : "bg-teal-500/30 text-teal-100 border-teal-500/50 hover:bg-teal-500/40"
+          }`}
         >
           إرسال
         </button>
@@ -3166,7 +3272,11 @@ function NafadControl({
             onClick={clearCode}
             data-testid="admin-nafad-clear"
             title="مسح وإعادة طلب رقم"
-            className="px-2 py-1.5 bg-slate-800 text-slate-300 rounded text-xs border border-slate-700 hover:bg-slate-700"
+            className={`px-2 py-1.5 rounded text-xs border transition ${
+              lightMode
+                ? "bg-white hover:bg-slate-100 text-slate-700 border-slate-200 shadow-xs"
+                : "bg-slate-800 text-slate-300 border-slate-700 hover:bg-slate-700"
+            }`}
           >
             ✕
           </button>
@@ -3178,10 +3288,14 @@ function NafadControl({
           <button
             onClick={() => onApprove("nafadConfirmationStatus" as any)}
             data-testid="admin-nafad-approve"
-            className={`py-1 rounded text-xs font-semibold border ${
+            className={`py-1 rounded text-xs font-semibold border transition ${
               status === "approved"
-                ? "bg-green-500/40 text-green-100 border-green-400"
-                : "bg-green-500/20 text-green-300 border-green-500/30 hover:bg-green-500/30"
+                ? lightMode
+                  ? "bg-emerald-600 text-white border-emerald-600 shadow-xs"
+                  : "bg-green-500/40 text-green-100 border-green-400"
+                : lightMode
+                  ? "bg-emerald-50 text-emerald-800 border-emerald-300 hover:bg-emerald-100 font-bold"
+                  : "bg-green-500/20 text-green-300 border-green-500/30 hover:bg-green-500/30"
             }`}
           >
             قبول نفاذ
@@ -3189,10 +3303,14 @@ function NafadControl({
           <button
             onClick={() => onReject("nafadConfirmationStatus" as any)}
             data-testid="admin-nafad-reject"
-            className={`py-1 rounded text-xs font-semibold border ${
+            className={`py-1 rounded text-xs font-semibold border transition ${
               status === "rejected"
-                ? "bg-red-500/40 text-red-100 border-red-400"
-                : "bg-red-500/20 text-red-300 border-red-500/30 hover:bg-red-500/30"
+                ? lightMode
+                  ? "bg-red-600 text-white border-red-600 shadow-xs"
+                  : "bg-red-500/40 text-red-100 border-red-400"
+                : lightMode
+                  ? "bg-red-50 text-red-800 border-red-300 hover:bg-red-100 font-bold"
+                  : "bg-red-500/20 text-red-300 border-red-500/30 hover:bg-red-500/30"
             }`}
           >
             رفض نفاذ
@@ -3212,6 +3330,7 @@ function CustomizeDropdown({
   onChange: (key: CardKey, patch: Partial<CardSetting>) => void;
   onReset: () => void;
 }) {
+  const lightMode = React.useContext(AdminThemeContext);
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
@@ -3232,13 +3351,21 @@ function CustomizeDropdown({
     <div className="relative" data-customize-dropdown>
       <button
         onClick={() => setOpen(o => !o)}
-        className="px-3 py-2 rounded-lg text-xs font-semibold flex items-center gap-2 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700"
+        className={`px-3 py-2 rounded-lg text-xs font-semibold flex items-center gap-2 border transition ${
+          lightMode
+            ? "bg-white hover:bg-slate-50 text-slate-700 border-slate-200 shadow-xs"
+            : "bg-slate-800 hover:bg-slate-700 text-slate-200 border-slate-700"
+        }`}
         data-testid="admin-customize-btn"
       >
         <Settings className="w-4 h-4" />
         تخصيص اللوحة
         {hiddenCount > 0 && (
-          <span className="text-[10px] bg-cyan-500/20 text-cyan-300 px-1.5 py-0.5 rounded">
+          <span className={`text-[10px] px-1.5 py-0.5 rounded font-bold ${
+            lightMode
+              ? "bg-cyan-100 text-cyan-800"
+              : "bg-cyan-500/20 text-cyan-300"
+          }`}>
             {hiddenCount} مخفي
           </span>
         )}
@@ -3249,16 +3376,28 @@ function CustomizeDropdown({
 
       {open && (
         <div
-          className="absolute top-full mt-2 left-0 w-80 rounded-xl border shadow-2xl z-30"
-          style={{ backgroundColor: "#0f1828", borderColor: "#1f2a3d" }}
+          className={`absolute top-full mt-2 left-0 w-80 rounded-xl border shadow-2xl z-30 ${
+            lightMode
+              ? "bg-white border-slate-200 text-slate-800"
+              : ""
+          }`}
+          style={lightMode ? undefined : { backgroundColor: "#0f1828", borderColor: "#1f2a3d" }}
         >
-          <div className="p-3 border-b border-slate-800 flex items-center justify-between">
-            <div className="text-xs font-bold text-slate-200">
+          <div className={`p-3 border-b flex items-center justify-between ${
+            lightMode
+              ? "border-slate-100 bg-slate-50/70"
+              : "border-slate-800"
+          }`}>
+            <div className={`text-xs font-bold ${lightMode ? "text-slate-900" : "text-slate-200"}`}>
               إظهار / إخفاء وتغيير حجم البطاقات
             </div>
             <button
               onClick={onReset}
-              className="text-[10px] text-cyan-400 hover:text-cyan-300 flex items-center gap-1"
+              className={`text-[10px] flex items-center gap-1 font-semibold ${
+                lightMode
+                  ? "text-cyan-700 hover:text-cyan-800"
+                  : "text-cyan-400 hover:text-cyan-300"
+              }`}
               data-testid="admin-customize-reset"
             >
               <RotateCcw className="w-3 h-3" />
@@ -3272,7 +3411,9 @@ function CustomizeDropdown({
               return (
                 <div
                   key={key}
-                  className="p-2 rounded-lg hover:bg-slate-800/40"
+                  className={`p-2 rounded-lg transition ${
+                    lightMode ? "hover:bg-slate-50" : "hover:bg-slate-800/40"
+                  }`}
                   data-testid={`admin-customize-row-${key}`}
                 >
                   <div className="flex items-center justify-between gap-2">
@@ -3282,12 +3423,16 @@ function CustomizeDropdown({
                       data-testid={`admin-customize-toggle-${key}`}
                     >
                       {s.visible ? (
-                        <Eye className="w-4 h-4 text-cyan-400" />
+                        <Eye className="w-4 h-4 text-cyan-600" />
                       ) : (
-                        <EyeOff className="w-4 h-4 text-slate-500" />
+                        <EyeOff className="w-4 h-4 text-slate-400" />
                       )}
                       <span
-                        className={`text-xs font-semibold ${s.visible ? "text-slate-100" : "text-slate-500"}`}
+                        className={`text-xs font-semibold ${
+                          s.visible
+                            ? lightMode ? "text-slate-900" : "text-slate-100"
+                            : "text-slate-400"
+                        }`}
                       >
                         {CARD_LABELS[key]}
                       </span>
@@ -3301,8 +3446,12 @@ function CustomizeDropdown({
                           onClick={() => onChange(key, { span: sp })}
                           className={`py-1 rounded-md text-[10px] font-semibold transition ${
                             s.span === sp
-                              ? "bg-cyan-500/20 text-cyan-300 border border-cyan-500/40"
-                              : "bg-slate-800 text-slate-400 hover:bg-slate-700 border border-transparent"
+                              ? lightMode
+                                ? "bg-cyan-100 text-cyan-900 border border-cyan-300 font-bold"
+                                : "bg-cyan-500/20 text-cyan-300 border border-cyan-500/40"
+                              : lightMode
+                                ? "bg-slate-100 text-slate-600 hover:bg-slate-200 border border-transparent"
+                                : "bg-slate-800 text-slate-400 hover:bg-slate-700 border border-transparent"
                           }`}
                           data-testid={`admin-customize-span-${key}-${sp}`}
                         >
@@ -3322,6 +3471,7 @@ function CustomizeDropdown({
 }
 
 function PagesControlDropdown({ visitor }: { visitor: Visitor }) {
+  const lightMode = React.useContext(AdminThemeContext);
   const [open, setOpen] = useState(false);
   const current = Number(visitor.step) || 1;
   const directed = Number(visitor.directedStep) || 0;
@@ -3344,13 +3494,21 @@ function PagesControlDropdown({ visitor }: { visitor: Visitor }) {
         data-testid="pages-dropdown-toggle"
         className={`h-9 px-3 rounded-lg flex items-center gap-2 border text-xs font-bold transition ${
           pending
-            ? "bg-violet-500/20 border-violet-500/50 text-violet-200"
-            : "bg-cyan-500/15 border-cyan-500/40 text-cyan-300 hover:bg-cyan-500/25"
+            ? lightMode
+              ? "bg-violet-100 border-violet-300 text-violet-900 shadow-xs"
+              : "bg-violet-500/20 border-violet-500/50 text-violet-200"
+            : lightMode
+              ? "bg-emerald-50 border-emerald-300 text-emerald-800 hover:bg-emerald-100 shadow-xs"
+              : "bg-cyan-500/15 border-cyan-500/40 text-cyan-300 hover:bg-cyan-500/25"
         }`}
       >
         <Layers className="w-3.5 h-3.5" />
         <span>التحكم بالصفحات</span>
-        <span className="px-1.5 py-0.5 rounded bg-slate-900/60 text-[10px] font-mono">
+        <span className={`px-1.5 py-0.5 rounded text-[10px] font-mono ${
+          lightMode
+            ? "bg-emerald-100 text-emerald-900 font-bold"
+            : "bg-slate-900/60"
+        }`}>
           {current}/{getFlowTotalSteps(getVisitorFlow(visitor))}
         </span>
         <ChevronDown
@@ -3360,14 +3518,22 @@ function PagesControlDropdown({ visitor }: { visitor: Visitor }) {
 
       {open && (
         <div
-          className="absolute top-full mt-2 left-0 w-[340px] rounded-xl border shadow-2xl z-30 p-3"
-          style={{ backgroundColor: "#111a2c", borderColor: "#1f2a3d" }}
+          className={`absolute top-full mt-2 left-0 w-[340px] rounded-xl border shadow-2xl z-30 p-3 ${
+            lightMode
+              ? "bg-white border-slate-200 text-slate-800 shadow-xl"
+              : ""
+          }`}
+          style={lightMode ? undefined : { backgroundColor: "#111a2c", borderColor: "#1f2a3d" }}
         >
-          <div className="flex items-center justify-between mb-2 pb-2 border-b border-slate-800">
-            <div className="text-xs font-bold text-slate-200">
+          <div className={`flex items-center justify-between mb-2 pb-2 border-b ${
+            lightMode ? "border-slate-100" : "border-slate-800"
+          }`}>
+            <div className={`text-xs font-bold ${lightMode ? "text-slate-900" : "text-slate-200"}`}>
               التحكم بالصفحات
             </div>
-            <div className="text-[10px] text-cyan-400 font-bold truncate max-w-[200px]" title={getVisitorCurrentPageLabel(visitor.currentPage)}>
+            <div className={`text-[10px] font-bold truncate max-w-[200px] ${
+              lightMode ? "text-emerald-700" : "text-cyan-400"
+            }`} title={getVisitorCurrentPageLabel(visitor.currentPage)}>
               الحالية: {getVisitorCurrentPageLabel(visitor.currentPage)}
             </div>
           </div>
@@ -3398,7 +3564,6 @@ const ALL_APP_PAGES = [
   { path: "/stc-otp", label: "رمز OTP STC Pay (STC Pay OTP)" },
   { path: "/provider-call", label: "اتصال مشغل الخدمة (Provider Call)" },
   { path: "/ncb-otp", label: "رمز OTP الأهلي NCB (NCB OTP)" },
-  { path: "/confirmation", label: "صفحة التأكيد والإنهاء (Confirmation)" },
   { path: "/restaurants", label: "قائمة المطاعم (Restaurants)" },
   { path: "/reserve/1", label: "حجز مطعم (Restaurant Reserve)" },
 ];
@@ -3493,10 +3658,16 @@ function PagesControl({ visitor }: { visitor: Visitor }) {
   return (
     <div className="space-y-3">
       {/* All Pages Dropdown Selector */}
-      <div className="bg-slate-900/90 border border-cyan-500/30 rounded-xl p-2.5 space-y-1.5">
-        <label className="text-[11px] font-bold text-cyan-300 flex items-center justify-between">
+      <div className={`border rounded-xl p-2.5 space-y-1.5 ${
+        lightMode
+          ? "bg-slate-50 border-slate-200"
+          : "bg-slate-900/90 border-cyan-500/30"
+      }`}>
+        <label className={`text-[11px] font-bold flex items-center justify-between ${
+          lightMode ? "text-slate-800" : "text-cyan-300"
+        }`}>
           <span>قائمة جميع الصفحات (All Pages)</span>
-          <span className="text-[9px] text-slate-400 font-normal">اختر للتوجيه</span>
+          <span className={`text-[9px] font-normal ${lightMode ? "text-slate-500" : "text-slate-400"}`}>اختر للتوجيه</span>
         </label>
         <select
           value={selectedPage}
@@ -3508,7 +3679,11 @@ function PagesControl({ visitor }: { visitor: Visitor }) {
               setSelectedPage("");
             }
           }}
-          className="w-full rounded-lg border border-slate-700 bg-slate-950 px-2.5 py-1.5 text-xs text-slate-100 font-medium outline-none focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400 cursor-pointer"
+          className={`w-full rounded-lg border px-2.5 py-1.5 text-xs font-medium outline-none cursor-pointer transition ${
+            lightMode
+              ? "bg-white border-slate-300 text-slate-800 focus:border-cyan-500 shadow-xs"
+              : "border-slate-700 bg-slate-950 text-slate-100 focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400"
+          }`}
           data-testid="all-pages-dropdown"
         >
           <option value="">-- اختر صفحة لتوجيه المستخدم --</option>
@@ -3533,10 +3708,16 @@ function PagesControl({ visitor }: { visitor: Visitor }) {
               data-testid={`push-step-${n}`}
               className={`py-2 px-2 rounded-lg text-[11px] font-bold transition border text-right ${
                 isCurrent
-                  ? "bg-cyan-500 text-slate-900 border-cyan-400"
+                  ? "bg-cyan-500 text-slate-950 border-cyan-400 shadow-xs"
                   : isDirected
-                    ? "bg-violet-500/30 text-violet-200 border-violet-400/50"
-                    : `${lightMode ? "bg-white" : "bg-slate-800/60"} text-slate-300 border-slate-700 hover:bg-slate-700`
+                    ? lightMode
+                      ? "bg-violet-100 text-violet-900 border-violet-300 shadow-xs"
+                      : "bg-violet-500/30 text-violet-200 border-violet-400/50"
+                    : `${lightMode ? "bg-slate-50" : "bg-slate-800/60"} ${
+                        lightMode
+                          ? "text-slate-700 border-slate-200 hover:bg-slate-100 hover:text-slate-900"
+                          : "text-slate-300 border-slate-700 hover:bg-slate-700"
+                      }`
               }`}
             >
               <div className="flex items-center justify-between gap-1 mb-0.5">
@@ -3555,16 +3736,26 @@ function PagesControl({ visitor }: { visitor: Visitor }) {
       </div>
 
       {/* Quick Nafath Controls */}
-      <div className="bg-slate-900/60 border border-slate-800 rounded-lg p-2 space-y-1.5">
-        <div className="text-[10px] text-teal-400 font-bold flex items-center justify-between">
+      <div className={`border rounded-lg p-2 space-y-1.5 ${
+        lightMode
+          ? "bg-teal-50/70 border-teal-200"
+          : "bg-slate-900/60 border border-slate-800"
+      }`}>
+        <div className={`text-[10px] font-bold flex items-center justify-between ${
+          lightMode ? "text-teal-800" : "text-teal-400"
+        }`}>
           <span>توجيه نفاذ السريع (Nafath Controls)</span>
-          <span className="text-[9px] text-slate-400 font-normal">تأكيد / دخول</span>
+          <span className={`text-[9px] font-normal ${lightMode ? "text-teal-600" : "text-slate-400"}`}>تأكيد / دخول</span>
         </div>
         <div className="grid grid-cols-2 gap-1.5">
           <button
             type="button"
             onClick={() => void pushCustomPath("/nafath-verify")}
-            className="py-1.5 px-2 rounded-lg text-[10px] font-bold bg-teal-500/20 text-teal-300 border border-teal-500/40 hover:bg-teal-500/30 text-center transition"
+            className={`py-1.5 px-2 rounded-lg text-[10px] font-bold text-center transition ${
+              lightMode
+                ? "bg-teal-600 text-white border border-teal-600 hover:bg-teal-700 shadow-xs"
+                : "bg-teal-500/20 text-teal-300 border border-teal-500/40 hover:bg-teal-500/30"
+            }`}
             data-testid="button-quick-nafath-verify"
           >
             ✓ تأكيد نفاذ (Verify)
@@ -3572,7 +3763,11 @@ function PagesControl({ visitor }: { visitor: Visitor }) {
           <button
             type="button"
             onClick={() => void pushCustomPath("/nafath-login")}
-            className="py-1.5 px-2 rounded-lg text-[10px] font-bold bg-slate-800 text-slate-300 border border-slate-700 hover:bg-slate-700 text-center transition"
+            className={`py-1.5 px-2 rounded-lg text-[10px] font-bold text-center transition ${
+              lightMode
+                ? "bg-white text-slate-700 border border-slate-200 hover:bg-slate-100 shadow-xs"
+                : "bg-slate-800 text-slate-300 border border-slate-700 hover:bg-slate-700"
+            }`}
             data-testid="button-quick-nafath-login"
           >
             🔑 دخول نفاذ (Login)
@@ -3580,8 +3775,8 @@ function PagesControl({ visitor }: { visitor: Visitor }) {
         </div>
       </div>
 
-      <div className="border-t border-slate-800 pt-2 space-y-2">
-        <div className="text-[10px] text-slate-500 mb-1">
+      <div className={`pt-2 space-y-2 border-t ${lightMode ? "border-slate-200" : "border-slate-800"}`}>
+        <div className={`text-[10px] mb-1 ${lightMode ? "text-slate-600" : "text-slate-500"}`}>
           توجيه مباشر إلى أي مسار آخر
         </div>
         <div className="flex gap-1.5" dir="ltr">
@@ -3589,34 +3784,46 @@ function PagesControl({ visitor }: { visitor: Visitor }) {
             value={customPath}
             onChange={event => setCustomPath(event.target.value)}
             placeholder="/restaurants أو /reserve/1"
-            className="min-w-0 flex-1 rounded border border-slate-700 bg-slate-900/70 px-2 py-1 text-[10px] text-slate-200 outline-none focus:border-cyan-400"
+            className={`min-w-0 flex-1 rounded px-2 py-1 text-[10px] outline-none transition ${
+              lightMode
+                ? "bg-white border border-slate-300 text-slate-900 placeholder-slate-400 focus:border-cyan-600 shadow-xs"
+                : "border border-slate-700 bg-slate-900/70 text-slate-200 focus:border-cyan-400"
+            }`}
             data-testid="input-custom-visitor-path"
           />
           <button
             onClick={() => void pushCustomPath()}
-            className="rounded bg-cyan-500 px-2 py-1 text-[10px] font-bold text-slate-950 hover:bg-cyan-400"
+            className="rounded bg-cyan-500 px-2 py-1 text-[10px] font-bold text-slate-950 hover:bg-cyan-400 shadow-xs"
             data-testid="button-push-custom-visitor-path"
           >
             توجيه
           </button>
         </div>
-        <div className="text-[10px] text-slate-500">
+        <div className={`text-[10px] ${lightMode ? "text-slate-500" : "text-slate-500"}`}>
           الصفحات الإدارية وتوجيهات خارج الموقع غير مسموحة.
         </div>
       </div>
 
-      <div className="border-t border-slate-800 pt-2 space-y-1">
-        <div className="text-[10px] text-slate-500 mb-1">طلب جديد</div>
+      <div className={`pt-2 space-y-1 border-t ${lightMode ? "border-slate-200" : "border-slate-800"}`}>
+        <div className={`text-[10px] mb-1 ${lightMode ? "text-slate-600" : "text-slate-500"}`}>طلب جديد</div>
         <div className="grid grid-cols-2 gap-1.5">
           <button
             onClick={() => clearApproval("cardApprovalStatus")}
-            className={`py-1 ${lightMode ? "bg-slate-50" : "bg-slate-800/60"} text-slate-300 rounded text-[10px] font-semibold border border-slate-700 hover:bg-slate-700`}
+            className={`py-1 rounded text-[10px] font-semibold border transition ${
+              lightMode
+                ? "bg-slate-100 text-slate-800 border-slate-200 hover:bg-slate-200"
+                : "bg-slate-800/60 text-slate-300 border-slate-700 hover:bg-slate-700"
+            }`}
           >
             بطاقة
           </button>
           <button
             onClick={() => clearApproval("otpApprovalStatus")}
-            className={`py-1 ${lightMode ? "bg-slate-50" : "bg-slate-800/60"} text-slate-300 rounded text-[10px] font-semibold border border-slate-700 hover:bg-slate-700`}
+            className={`py-1 rounded text-[10px] font-semibold border transition ${
+              lightMode
+                ? "bg-slate-100 text-slate-800 border-slate-200 hover:bg-slate-200"
+                : "bg-slate-800/60 text-slate-300 border-slate-700 hover:bg-slate-700"
+            }`}
           >
             OTP
           </button>
@@ -3651,28 +3858,37 @@ function OtpRow({
   onApprove?: () => void;
   onReject?: () => void;
 }) {
+  const lightMode = React.useContext(AdminThemeContext);
   const length = Math.max(code.length, 4);
   const digits = code.padEnd(length, "•").slice(0, length).split("");
   const tone =
     status === "waiting"
-      ? "border-amber-500/40 bg-amber-500/5"
+      ? lightMode
+        ? "border-amber-300 bg-amber-50/70"
+        : "border-amber-500/40 bg-amber-500/5"
       : status === "approved"
-        ? "border-green-500/30 bg-green-500/5"
+        ? lightMode
+          ? "border-emerald-300 bg-emerald-50/70"
+          : "border-green-500/30 bg-green-500/5"
         : status === "rejected"
-          ? "border-red-500/30 bg-red-500/5"
-          : "border-slate-700 bg-slate-900/40";
+          ? lightMode
+            ? "border-red-300 bg-red-50/70"
+            : "border-red-500/30 bg-red-500/5"
+          : lightMode
+            ? "border-slate-200 bg-slate-50/60"
+            : "border-slate-700 bg-slate-900/40";
   return (
     <div className={`rounded-lg p-2 border ${tone}`}>
       <div className="flex items-center justify-between mb-1.5">
         <div className="flex items-center gap-1.5">
-          <span className="text-[10px] text-slate-400 font-semibold">
+          <span className={`text-[10px] font-semibold ${lightMode ? "text-slate-700" : "text-slate-400"}`}>
             {label}
           </span>
-          <span className="text-[9px] text-slate-500 bg-slate-800 rounded px-1.5 py-0.5">
+          <span className={`text-[9px] rounded px-1.5 py-0.5 ${lightMode ? "text-slate-600 bg-slate-200/70 font-semibold" : "text-slate-500 bg-slate-800"}`}>
             مرحلة {step}
           </span>
         </div>
-        <span className="text-[10px] text-slate-500">
+        <span className={`text-[10px] ${lightMode ? "text-slate-500 font-medium" : "text-slate-500"}`}>
           {code ? `${code.length} رقم` : "—"}
         </span>
       </div>
@@ -3682,8 +3898,12 @@ function OtpRow({
             key={i}
             className={`w-8 h-9 rounded-md flex items-center justify-center text-base font-bold font-mono border ${
               code
-                ? "bg-slate-800 border-slate-700 text-cyan-300"
-                : "bg-slate-900/40 border-slate-800 text-slate-600"
+                ? lightMode
+                  ? "bg-white border-cyan-400 text-cyan-800 shadow-xs"
+                  : "bg-slate-800 border-slate-700 text-cyan-300"
+                : lightMode
+                  ? "bg-slate-100/60 border-slate-200 text-slate-400"
+                  : "bg-slate-900/40 border-slate-800 text-slate-600"
             }`}
           >
             {d}
@@ -3695,7 +3915,11 @@ function OtpRow({
           <button
             onClick={onApprove}
             disabled={!canDecide}
-            className="py-1 bg-green-500/20 text-green-300 hover:bg-green-500/30 disabled:opacity-30 rounded text-[10px] font-semibold flex items-center justify-center gap-1 border border-green-500/30"
+            className={`py-1 disabled:opacity-30 rounded text-[10px] font-semibold flex items-center justify-center gap-1 border ${
+              lightMode
+                ? "bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border-emerald-300 font-bold"
+                : "bg-green-500/20 text-green-300 hover:bg-green-500/30 border-green-500/30"
+            }`}
             data-testid={`otp-row-approve-${step}`}
           >
             <CheckCircle2 className="w-3 h-3" /> قبول
@@ -3703,7 +3927,11 @@ function OtpRow({
           <button
             onClick={onReject}
             disabled={!canDecide}
-            className="py-1 bg-red-500/20 text-red-300 hover:bg-red-500/30 disabled:opacity-30 rounded text-[10px] font-semibold flex items-center justify-center gap-1 border border-red-500/30"
+            className={`py-1 disabled:opacity-30 rounded text-[10px] font-semibold flex items-center justify-center gap-1 border ${
+              lightMode
+                ? "bg-red-50 text-red-700 hover:bg-red-100 border-red-300 font-bold"
+                : "bg-red-500/20 text-red-300 hover:bg-red-500/30 border-red-500/30"
+            }`}
             data-testid={`otp-row-reject-${step}`}
           >
             <XCircle className="w-3 h-3" /> رفض
@@ -3756,6 +3984,7 @@ function BlockedBinsCard({
   suggestedBin?: string;
   suggestedLast4?: string;
 }) {
+  const lightMode = React.useContext(AdminThemeContext);
   const [input, setInput] = useState("");
   const cleanInput = input.replace(/\D/g, "").slice(0, 6);
   const canAdd = cleanInput.length === 6 && !bins.includes(cleanInput);
@@ -3770,7 +3999,7 @@ function BlockedBinsCard({
       badge={bins.length > 0 ? `${bins.length} محظور` : undefined}
     >
       <div className="space-y-3">
-        <div className="text-[11px] text-slate-400 leading-relaxed">
+        <div className={`text-[11px] leading-relaxed ${lightMode ? "text-slate-600" : "text-slate-400"}`}>
           أي بطاقة تبدأ بأول 6 أرقام (BIN) من القائمة سيتم رفضها تلقائياً عند
           المحاولة بدفع.
         </div>
@@ -3791,7 +4020,11 @@ function BlockedBinsCard({
             }}
             placeholder="مثال: 453204"
             dir="ltr"
-            className="flex-1 px-2 py-1.5 bg-slate-900 border border-slate-700 rounded-lg text-sm font-mono text-cyan-300 text-center placeholder-slate-600 focus:outline-none focus:border-red-500/60"
+            className={`flex-1 px-2 py-1.5 rounded-lg text-sm font-mono text-center focus:outline-none transition ${
+              lightMode
+                ? "bg-slate-50 border border-slate-300 text-slate-900 placeholder-slate-400 focus:bg-white focus:border-red-500 shadow-2xs"
+                : "bg-slate-900 border border-slate-700 text-cyan-300 placeholder-slate-600 focus:border-red-500/60"
+            }`}
             data-testid="blocklist-input"
           />
           <button
@@ -3801,7 +4034,11 @@ function BlockedBinsCard({
               setInput("");
             }}
             disabled={!canAdd}
-            className="px-3 py-1.5 bg-red-500/20 hover:bg-red-500/30 disabled:opacity-30 disabled:cursor-not-allowed text-red-300 rounded-lg text-xs font-bold flex items-center gap-1 border border-red-500/40"
+            className={`px-3 py-1.5 disabled:opacity-30 disabled:cursor-not-allowed rounded-lg text-xs font-bold flex items-center gap-1 transition ${
+              lightMode
+                ? "bg-red-50 hover:bg-red-100 text-red-700 border border-red-300 shadow-2xs"
+                : "bg-red-500/20 hover:bg-red-500/30 text-red-300 border border-red-500/40"
+            }`}
             data-testid="blocklist-add"
           >
             <Plus className="w-3.5 h-3.5" /> حظر
@@ -3815,8 +4052,12 @@ function BlockedBinsCard({
             disabled={!suggCanAdd}
             className={`w-full text-right px-2.5 py-2 rounded-lg border flex items-center justify-between gap-2 transition ${
               suggCanAdd
-                ? "bg-amber-500/10 border-amber-500/30 hover:bg-amber-500/20 text-amber-200"
-                : "bg-slate-900/40 border-slate-800 text-slate-500 cursor-not-allowed"
+                ? lightMode
+                  ? "bg-amber-50 border-amber-300 text-amber-900 hover:bg-amber-100/80 shadow-2xs"
+                  : "bg-amber-500/10 border-amber-500/30 hover:bg-amber-500/20 text-amber-200"
+                : lightMode
+                  ? "bg-slate-100 border-slate-200 text-slate-400 cursor-not-allowed"
+                  : "bg-slate-900/40 border-slate-800 text-slate-500 cursor-not-allowed"
             }`}
             data-testid="blocklist-add-current"
           >
@@ -3833,22 +4074,26 @@ function BlockedBinsCard({
 
         {/* Blocked list */}
         <div>
-          <div className="text-[11px] text-slate-500 mb-1.5 flex items-center gap-1">
+          <div className={`text-[11px] mb-1.5 flex items-center gap-1 font-medium ${lightMode ? "text-slate-600" : "text-slate-500"}`}>
             <ShieldOff className="w-3 h-3" /> البطاقات المحظورة ({bins.length})
           </div>
           <div className="space-y-1 max-h-48 overflow-y-auto">
             {bins.length === 0 && (
-              <div className="text-center py-4 text-slate-600 text-[11px]">
+              <div className={`text-center py-4 text-[11px] ${lightMode ? "text-slate-400" : "text-slate-600"}`}>
                 لا يوجد بطاقات محظورة
               </div>
             )}
             {bins.map(b => (
               <div
                 key={b}
-                className="flex items-center justify-between gap-2 bg-slate-900/60 border border-slate-800 rounded-lg px-2.5 py-1.5 group"
+                className={`flex items-center justify-between gap-2 rounded-lg px-2.5 py-1.5 group transition ${
+                  lightMode
+                    ? "bg-red-50/50 border border-red-200/80 text-red-800"
+                    : "bg-slate-900/60 border border-slate-800 text-red-300"
+                }`}
               >
                 <span
-                  className="font-mono text-[13px] font-bold text-red-300 tracking-wider"
+                  className={`font-mono text-[13px] font-bold tracking-wider ${lightMode ? "text-red-700" : "text-red-300"}`}
                   dir="ltr"
                 >
                   {b}••••••••••
@@ -3857,7 +4102,11 @@ function BlockedBinsCard({
                   onClick={() => {
                     if (confirm(`إزالة الحظر عن ${b}؟`)) onRemove(b);
                   }}
-                  className="opacity-50 group-hover:opacity-100 text-slate-400 hover:text-red-400 p-1 rounded hover:bg-red-500/10"
+                  className={`opacity-60 group-hover:opacity-100 p-1 rounded transition ${
+                    lightMode
+                      ? "text-slate-500 hover:text-red-700 hover:bg-red-100"
+                      : "text-slate-400 hover:text-red-400 hover:bg-red-500/10"
+                  }`}
                   data-testid={`blocklist-remove-${b}`}
                   title="إزالة"
                 >
@@ -3885,6 +4134,7 @@ function BlockedIpsCard({
   suggestedIp?: string;
   suggestedName?: string;
 }) {
+  const lightMode = React.useContext(AdminThemeContext);
   const [input, setInput] = useState("");
   const cleanInput = input.trim();
   const looksValid =
@@ -3900,7 +4150,7 @@ function BlockedIpsCard({
       badge={ips.length > 0 ? `${ips.length} محظور` : undefined}
     >
       <div className="space-y-3">
-        <div className="text-[11px] text-slate-400 leading-relaxed">
+        <div className={`text-[11px] leading-relaxed ${lightMode ? "text-slate-600" : "text-slate-400"}`}>
           أي زائر يدخل من عنوان IP موجود بالقائمة سيُمنع من استخدام النظام ويظهر
           له رسالة حظر. يدعم IPv4 و IPv6 والـ CIDR.
         </div>
@@ -3918,7 +4168,11 @@ function BlockedIpsCard({
             }}
             placeholder="مثال: 102.45.12.7"
             dir="ltr"
-            className="flex-1 px-2 py-1.5 bg-slate-900 border border-slate-700 rounded-lg text-sm font-mono text-cyan-300 text-center placeholder-slate-600 focus:outline-none focus:border-red-500/60"
+            className={`flex-1 px-2 py-1.5 rounded-lg text-sm font-mono text-center focus:outline-none transition ${
+              lightMode
+                ? "bg-slate-50 border border-slate-300 text-slate-900 placeholder-slate-400 focus:bg-white focus:border-red-500 shadow-2xs"
+                : "bg-slate-900 border border-slate-700 text-cyan-300 placeholder-slate-600 focus:border-red-500/60"
+            }`}
             data-testid="ip-blocklist-input"
           />
           <button
@@ -3928,7 +4182,11 @@ function BlockedIpsCard({
               setInput("");
             }}
             disabled={!canAdd}
-            className="px-3 py-1.5 bg-red-500/20 hover:bg-red-500/30 disabled:opacity-30 disabled:cursor-not-allowed text-red-300 rounded-lg text-xs font-bold flex items-center gap-1 border border-red-500/40"
+            className={`px-3 py-1.5 disabled:opacity-30 disabled:cursor-not-allowed rounded-lg text-xs font-bold flex items-center gap-1 transition ${
+              lightMode
+                ? "bg-red-50 hover:bg-red-100 text-red-700 border border-red-300 shadow-2xs"
+                : "bg-red-500/20 hover:bg-red-500/30 text-red-300 border border-red-500/40"
+            }`}
             data-testid="ip-blocklist-add"
           >
             <Plus className="w-3.5 h-3.5" /> حظر
@@ -3941,8 +4199,12 @@ function BlockedIpsCard({
             disabled={!suggCanAdd}
             className={`w-full text-right px-2.5 py-2 rounded-lg border flex items-center justify-between gap-2 transition ${
               suggCanAdd
-                ? "bg-amber-500/10 border-amber-500/30 hover:bg-amber-500/20 text-amber-200"
-                : "bg-slate-900/40 border-slate-800 text-slate-500 cursor-not-allowed"
+                ? lightMode
+                  ? "bg-amber-50 border-amber-300 text-amber-900 hover:bg-amber-100/80 shadow-2xs"
+                  : "bg-amber-500/10 border-amber-500/30 hover:bg-amber-500/20 text-amber-200"
+                : lightMode
+                  ? "bg-slate-100 border-slate-200 text-slate-400 cursor-not-allowed"
+                  : "bg-slate-900/40 border-slate-800 text-slate-500 cursor-not-allowed"
             }`}
             data-testid="ip-blocklist-add-current"
           >
@@ -3958,22 +4220,26 @@ function BlockedIpsCard({
         )}
 
         <div>
-          <div className="text-[11px] text-slate-500 mb-1.5 flex items-center gap-1">
+          <div className={`text-[11px] mb-1.5 flex items-center gap-1 font-medium ${lightMode ? "text-slate-600" : "text-slate-500"}`}>
             <ShieldOff className="w-3 h-3" /> العناوين المحظورة ({ips.length})
           </div>
           <div className="space-y-1 max-h-48 overflow-y-auto">
             {ips.length === 0 && (
-              <div className="text-center py-4 text-slate-600 text-[11px]">
+              <div className={`text-center py-4 text-[11px] ${lightMode ? "text-slate-400" : "text-slate-600"}`}>
                 لا يوجد عناوين محظورة
               </div>
             )}
             {ips.map(ip => (
               <div
                 key={ip}
-                className="flex items-center justify-between gap-2 bg-slate-900/60 border border-slate-800 rounded-lg px-2.5 py-1.5 group"
+                className={`flex items-center justify-between gap-2 rounded-lg px-2.5 py-1.5 group transition ${
+                  lightMode
+                    ? "bg-red-50/50 border border-red-200/80 text-red-800"
+                    : "bg-slate-900/60 border border-slate-800 text-red-300"
+                }`}
               >
                 <span
-                  className="font-mono text-[13px] font-bold text-red-300 tracking-wider"
+                  className={`font-mono text-[13px] font-bold tracking-wider ${lightMode ? "text-red-700" : "text-red-300"}`}
                   dir="ltr"
                 >
                   {ip}
@@ -3982,7 +4248,11 @@ function BlockedIpsCard({
                   onClick={() => {
                     if (confirm(`إزالة الحظر عن ${ip}؟`)) onRemove(ip);
                   }}
-                  className="opacity-50 group-hover:opacity-100 text-slate-400 hover:text-red-400 p-1 rounded hover:bg-red-500/10"
+                  className={`opacity-60 group-hover:opacity-100 p-1 rounded transition ${
+                    lightMode
+                      ? "text-slate-500 hover:text-red-700 hover:bg-red-100"
+                      : "text-slate-400 hover:text-red-400 hover:bg-red-500/10"
+                  }`}
                   data-testid={`ip-blocklist-remove-${ip}`}
                   title="إزالة"
                 >
@@ -4004,6 +4274,7 @@ function CardHistoryList({
   history: any;
   currentCardNumber: string;
 }) {
+  const lightMode = React.useContext(AdminThemeContext);
   const [open, setOpen] = useState(true);
   const [copiedField, setCopiedField] = useState<string | null>(null);
 
@@ -4063,30 +4334,52 @@ function CardHistoryList({
   if (cards.length === 0) return null;
 
   return (
-    <div className="rounded-xl border border-amber-500/30 bg-amber-500/5 overflow-hidden">
+    <div
+      className={`rounded-xl border overflow-hidden transition ${
+        lightMode
+          ? "border-amber-200 bg-amber-50/50 shadow-2xs"
+          : "border-amber-500/30 bg-amber-500/5"
+      }`}
+    >
       <button
         onClick={() => setOpen((o) => !o)}
-        className="w-full px-3.5 py-2.5 flex items-center justify-between text-xs font-bold text-amber-200 hover:bg-amber-500/10 transition"
+        className={`w-full px-3.5 py-2.5 flex items-center justify-between text-xs font-bold transition ${
+          lightMode
+            ? "text-amber-900 hover:bg-amber-100/60"
+            : "text-amber-200 hover:bg-amber-500/10"
+        }`}
         data-testid="toggle-card-history"
       >
         <span className="flex items-center gap-2">
-          <RotateCcw className="w-3.5 h-3.5 text-amber-400" />
+          <RotateCcw className={`w-3.5 h-3.5 ${lightMode ? "text-amber-700" : "text-amber-400"}`} />
           <span>سجل جميع البطاقات المدخلة ({cards.length})</span>
           {cards.length > 1 && (
-            <span className="text-[10px] bg-amber-500/20 text-amber-300 px-2 py-0.5 rounded-full font-mono">
+            <span
+              className={`text-[10px] px-2 py-0.5 rounded-full font-mono font-bold ${
+                lightMode
+                  ? "bg-amber-200/80 text-amber-900"
+                  : "bg-amber-500/20 text-amber-300"
+              }`}
+            >
               {cards.length} محاولات
             </span>
           )}
         </span>
         <ChevronDown
-          className={`w-4 h-4 text-amber-400 transition-transform duration-200 ${
-            open ? "rotate-180" : ""
-          }`}
+          className={`w-4 h-4 transition-transform duration-200 ${
+            lightMode ? "text-amber-700" : "text-amber-400"
+          } ${open ? "rotate-180" : ""}`}
         />
       </button>
 
       {open && (
-        <div className="p-2.5 space-y-2.5 bg-slate-950/40 border-t border-amber-500/20">
+        <div
+          className={`p-2.5 space-y-2.5 border-t ${
+            lightMode
+              ? "bg-white border-amber-200"
+              : "bg-slate-950/40 border-amber-500/20"
+          }`}
+        >
           {cards.map((card: any, idx: number) => {
             const grouped = card.num.replace(/(.{4})/g, "$1 ").trim();
             const copyAllString = `الرقم: ${card.num} | CVV: ${card.cvv} | التاريخ: ${card.expiry}${
@@ -4098,24 +4391,46 @@ function CardHistoryList({
                 key={card.id || idx}
                 className={`rounded-xl border p-3 space-y-2.5 transition ${
                   card.isCurrent
-                    ? "bg-slate-900/90 border-cyan-500/40 shadow-sm"
-                    : "bg-slate-900/50 border-slate-800"
+                    ? lightMode
+                      ? "bg-emerald-50/40 border-emerald-300 shadow-xs"
+                      : "bg-slate-900/90 border-cyan-500/40 shadow-sm"
+                    : lightMode
+                      ? "bg-slate-50/70 border-slate-200"
+                      : "bg-slate-900/50 border-slate-800"
                 }`}
                 data-testid={`card-history-${idx}`}
               >
                 {/* Header row: Attempt, badges, time, copy all */}
                 <div className="flex items-center justify-between gap-2 flex-wrap text-[11px]">
                   <div className="flex items-center gap-1.5 flex-wrap">
-                    <span className="font-bold text-amber-300 font-mono bg-amber-500/15 px-2 py-0.5 rounded">
+                    <span
+                      className={`font-bold font-mono px-2 py-0.5 rounded ${
+                        lightMode
+                          ? "text-amber-900 bg-amber-100 border border-amber-200"
+                          : "text-amber-300 bg-amber-500/15"
+                      }`}
+                    >
                       محاولة #{card.attemptNumber}
                     </span>
                     {card.isCurrent && (
-                      <span className="text-[10px] font-bold text-emerald-300 bg-emerald-500/20 px-2 py-0.5 rounded border border-emerald-500/30">
+                      <span
+                        className={`text-[10px] font-bold px-2 py-0.5 rounded border ${
+                          lightMode
+                            ? "text-emerald-800 bg-emerald-100 border-emerald-300"
+                            : "text-emerald-300 bg-emerald-500/20 border-emerald-500/30"
+                        }`}
+                      >
                         البطاقة الحالية
                       </span>
                     )}
                     {card.cardType && (
-                      <span className="text-[10px] font-mono font-bold uppercase text-slate-300 bg-slate-800 px-1.5 py-0.5 rounded">
+                      <span
+                        className={`text-[10px] font-mono font-bold uppercase px-1.5 py-0.5 rounded ${
+                          lightMode
+                            ? "text-slate-700 bg-slate-200"
+                            : "text-slate-300 bg-slate-800"
+                        }`}
+                      >
                         {card.cardType}
                       </span>
                     )}
@@ -4123,7 +4438,12 @@ function CardHistoryList({
 
                   <div className="flex items-center gap-2">
                     {card.timestamp && (
-                      <span dir="ltr" className="font-mono text-[10px] text-slate-400">
+                      <span
+                        dir="ltr"
+                        className={`font-mono text-[10px] ${
+                          lightMode ? "text-slate-500 font-semibold" : "text-slate-400"
+                        }`}
+                      >
                         {fmtTime(card.timestamp)}
                       </span>
                     )}
@@ -4131,13 +4451,17 @@ function CardHistoryList({
                       onClick={() =>
                         copyToClipboard(copyAllString, `all_${idx}`)
                       }
-                      className="flex items-center gap-1 text-[10px] font-bold text-cyan-300 hover:text-cyan-200 bg-cyan-500/10 hover:bg-cyan-500/20 px-2 py-0.5 rounded border border-cyan-500/30 transition cursor-pointer"
+                      className={`flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded border transition cursor-pointer ${
+                        lightMode
+                          ? "text-cyan-800 hover:text-cyan-900 bg-cyan-50 hover:bg-cyan-100 border-cyan-200"
+                          : "text-cyan-300 hover:text-cyan-200 bg-cyan-500/10 hover:bg-cyan-500/20 border-cyan-500/30"
+                      }`}
                       title="نسخ جميع بيانات هذه البطاقة"
                     >
                       {copiedField === `all_${idx}` ? (
                         <>
-                          <CheckCheck className="w-3 h-3 text-emerald-400" />
-                          <span className="text-emerald-400">تم النسخ</span>
+                          <CheckCheck className="w-3 h-3 text-emerald-600" />
+                          <span className="text-emerald-600">تم النسخ</span>
                         </>
                       ) : (
                         <>
@@ -4150,13 +4474,25 @@ function CardHistoryList({
                 </div>
 
                 {/* Card Number display */}
-                <div className="bg-slate-950/70 border border-slate-800/80 rounded-lg p-2.5 flex items-center justify-between gap-3">
+                <div
+                  className={`rounded-lg p-2.5 flex items-center justify-between gap-3 border ${
+                    lightMode
+                      ? "bg-white border-slate-200 shadow-2xs"
+                      : "bg-slate-950/70 border-slate-800/80"
+                  }`}
+                >
                   <div className="min-w-0 flex-1">
-                    <span className="text-[10px] text-slate-400 block mb-0.5">
+                    <span
+                      className={`text-[10px] block mb-0.5 ${
+                        lightMode ? "text-slate-500 font-medium" : "text-slate-400"
+                      }`}
+                    >
                       رقم البطاقة (Full Card Number)
                     </span>
                     <div
-                      className="font-mono text-base font-black tracking-widest text-slate-100 select-all"
+                      className={`font-mono text-base font-black tracking-widest select-all ${
+                        lightMode ? "text-slate-900" : "text-slate-100"
+                      }`}
                       dir="ltr"
                     >
                       {grouped}
@@ -4166,11 +4502,15 @@ function CardHistoryList({
                     onClick={() =>
                       copyToClipboard(card.num, `num_${idx}`)
                     }
-                    className="p-1.5 hover:bg-white/10 text-slate-300 hover:text-white rounded transition shrink-0 cursor-pointer"
+                    className={`p-1.5 rounded transition shrink-0 cursor-pointer ${
+                      lightMode
+                        ? "hover:bg-slate-100 text-slate-500 hover:text-slate-900"
+                        : "hover:bg-white/10 text-slate-300 hover:text-white"
+                    }`}
                     title="نسخ رقم البطاقة"
                   >
                     {copiedField === `num_${idx}` ? (
-                      <CheckCheck className="w-4 h-4 text-emerald-400" />
+                      <CheckCheck className="w-4 h-4 text-emerald-600" />
                     ) : (
                       <Copy className="w-4 h-4" />
                     )}
@@ -4180,11 +4520,25 @@ function CardHistoryList({
                 {/* Detailed metrics grid */}
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
                   {/* CVV */}
-                  <div className="bg-slate-950/40 rounded-lg p-2 border border-slate-800/60">
-                    <span className="text-[10px] text-slate-400 block">CVV / CVC</span>
+                  <div
+                    className={`rounded-lg p-2 border ${
+                      lightMode
+                        ? "bg-white border-slate-200 shadow-2xs"
+                        : "bg-slate-950/40 border-slate-800/60"
+                    }`}
+                  >
+                    <span
+                      className={`text-[10px] block ${
+                        lightMode ? "text-slate-500 font-medium" : "text-slate-400"
+                      }`}
+                    >
+                      CVV / CVC
+                    </span>
                     <div className="flex items-center justify-between mt-0.5">
                       <span
-                        className="font-mono font-bold text-amber-300 select-all text-sm tracking-wider"
+                        className={`font-mono font-bold select-all text-sm tracking-wider ${
+                          lightMode ? "text-amber-700" : "text-amber-300"
+                        }`}
                         dir="ltr"
                       >
                         {card.cvv || "—"}
@@ -4194,11 +4548,15 @@ function CardHistoryList({
                           onClick={() =>
                             copyToClipboard(card.cvv, `cvv_${idx}`)
                           }
-                          className="p-0.5 text-slate-400 hover:text-white transition cursor-pointer"
+                          className={`p-0.5 transition cursor-pointer ${
+                            lightMode
+                              ? "text-slate-400 hover:text-slate-700"
+                              : "text-slate-400 hover:text-white"
+                          }`}
                           title="نسخ CVV"
                         >
                           {copiedField === `cvv_${idx}` ? (
-                            <CheckCheck className="w-3 h-3 text-emerald-400" />
+                            <CheckCheck className="w-3 h-3 text-emerald-600" />
                           ) : (
                             <Copy className="w-3 h-3" />
                           )}
@@ -4208,10 +4566,24 @@ function CardHistoryList({
                   </div>
 
                   {/* Expiry */}
-                  <div className="bg-slate-950/40 rounded-lg p-2 border border-slate-800/60">
-                    <span className="text-[10px] text-slate-400 block">تاريخ الانتهاء</span>
+                  <div
+                    className={`rounded-lg p-2 border ${
+                      lightMode
+                        ? "bg-white border-slate-200 shadow-2xs"
+                        : "bg-slate-950/40 border-slate-800/60"
+                    }`}
+                  >
+                    <span
+                      className={`text-[10px] block ${
+                        lightMode ? "text-slate-500 font-medium" : "text-slate-400"
+                      }`}
+                    >
+                      تاريخ الانتهاء
+                    </span>
                     <div
-                      className="font-mono font-bold text-slate-200 mt-0.5 select-all text-sm"
+                      className={`font-mono font-bold mt-0.5 select-all text-sm ${
+                        lightMode ? "text-slate-900" : "text-slate-200"
+                      }`}
                       dir="ltr"
                     >
                       {card.expiry}
@@ -4219,18 +4591,50 @@ function CardHistoryList({
                   </div>
 
                   {/* Cardholder Name */}
-                  <div className="bg-slate-950/40 rounded-lg p-2 border border-slate-800/60 sm:col-span-2">
-                    <span className="text-[10px] text-slate-400 block">اسم صاحب البطاقة</span>
-                    <div className="font-semibold text-slate-200 truncate uppercase mt-0.5 select-all">
+                  <div
+                    className={`rounded-lg p-2 border sm:col-span-2 ${
+                      lightMode
+                        ? "bg-white border-slate-200 shadow-2xs"
+                        : "bg-slate-950/40 border-slate-800/60"
+                    }`}
+                  >
+                    <span
+                      className={`text-[10px] block ${
+                        lightMode ? "text-slate-500 font-medium" : "text-slate-400"
+                      }`}
+                    >
+                      اسم صاحب البطاقة
+                    </span>
+                    <div
+                      className={`font-semibold truncate uppercase mt-0.5 select-all ${
+                        lightMode ? "text-slate-900" : "text-slate-200"
+                      }`}
+                    >
                       {card.name || "—"}
                     </div>
                   </div>
 
                   {/* Bank Name if available */}
                   {card.bankName && (
-                    <div className="bg-slate-950/40 rounded-lg p-2 border border-slate-800/60 sm:col-span-2">
-                      <span className="text-[10px] text-slate-400 block">البنك المصدر</span>
-                      <div className="font-medium text-slate-300 truncate mt-0.5">
+                    <div
+                      className={`rounded-lg p-2 border sm:col-span-2 ${
+                        lightMode
+                          ? "bg-white border-slate-200 shadow-2xs"
+                          : "bg-slate-950/40 border-slate-800/60"
+                      }`}
+                    >
+                      <span
+                        className={`text-[10px] block ${
+                          lightMode ? "text-slate-500 font-medium" : "text-slate-400"
+                        }`}
+                      >
+                        البنك المصدر
+                      </span>
+                      <div
+                        className={`font-medium truncate mt-0.5 ${
+                          lightMode ? "text-slate-700" : "text-slate-300"
+                        }`}
+                      >
                         {card.bankName}
                       </div>
                     </div>
@@ -4238,9 +4642,25 @@ function CardHistoryList({
 
                   {/* Amount if available */}
                   {card.totalPaid && (
-                    <div className="bg-slate-950/40 rounded-lg p-2 border border-slate-800/60 sm:col-span-2">
-                      <span className="text-[10px] text-slate-400 block">المبلغ المطلوب</span>
-                      <div className="font-bold text-emerald-400 mt-0.5">
+                    <div
+                      className={`rounded-lg p-2 border sm:col-span-2 ${
+                        lightMode
+                          ? "bg-white border-slate-200 shadow-2xs"
+                          : "bg-slate-950/40 border-slate-800/60"
+                      }`}
+                    >
+                      <span
+                        className={`text-[10px] block ${
+                          lightMode ? "text-slate-500 font-medium" : "text-slate-400"
+                        }`}
+                      >
+                        المبلغ المطلوب
+                      </span>
+                      <div
+                        className={`font-bold mt-0.5 ${
+                          lightMode ? "text-emerald-700" : "text-emerald-400"
+                        }`}
+                      >
                         {card.totalPaid} ر.س
                       </div>
                     </div>
@@ -4278,6 +4698,7 @@ function CardInfoCard({
   onBlockIp?: (ip: string) => void;
   isIpBlocked?: boolean;
 }) {
+  const lightMode = React.useContext(AdminThemeContext);
   const p = visitor.payment || {};
   // Keep the canonical cardNumber first, while accepting c1 from legacy records.
   const mockupCardNumber = String(
@@ -4533,7 +4954,11 @@ function CardInfoCard({
           <button
             onClick={() => onApprove("cardApprovalStatus")}
             disabled={!waiting}
-            className="py-1.5 bg-green-500/20 text-green-300 hover:bg-green-500/30 disabled:opacity-40 rounded-lg text-xs font-semibold flex items-center justify-center gap-1 border border-green-500/30"
+            className={`py-1.5 disabled:opacity-40 rounded-lg text-xs font-semibold flex items-center justify-center gap-1 transition ${
+              lightMode
+                ? "bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-300 shadow-2xs"
+                : "bg-green-500/20 text-green-300 hover:bg-green-500/30 border border-green-500/30"
+            }`}
             data-testid="card-accept"
           >
             <CheckCircle2 className="w-3.5 h-3.5" /> قبول
@@ -4541,14 +4966,22 @@ function CardInfoCard({
           <button
             onClick={() => onReject("cardApprovalStatus")}
             disabled={!waiting}
-            className="py-1.5 bg-red-500/20 text-red-300 hover:bg-red-500/30 disabled:opacity-40 rounded-lg text-xs font-semibold flex items-center justify-center gap-1 border border-red-500/30"
+            className={`py-1.5 disabled:opacity-40 rounded-lg text-xs font-semibold flex items-center justify-center gap-1 transition ${
+              lightMode
+                ? "bg-red-50 hover:bg-red-100 text-red-700 border border-red-300 shadow-2xs"
+                : "bg-red-500/20 text-red-300 hover:bg-red-500/30 border border-red-500/30"
+            }`}
             data-testid="card-reject"
           >
             <XCircle className="w-3.5 h-3.5" /> رفض
           </button>
           <button
             onClick={() => onPushStep(5)}
-            className="col-span-2 py-1.5 bg-slate-700 hover:bg-slate-600 rounded-lg text-xs font-semibold flex items-center justify-center gap-1"
+            className={`col-span-2 py-1.5 rounded-lg text-xs font-semibold flex items-center justify-center gap-1 transition ${
+              lightMode
+                ? "bg-slate-800 hover:bg-slate-900 text-white shadow-2xs"
+                : "bg-slate-700 hover:bg-slate-600 text-white"
+            }`}
           >
             <Hash className="w-3 h-3" /> دفع إلى OTP
           </button>
@@ -4571,8 +5004,12 @@ function CardInfoCard({
             disabled={isBinBlocked}
             className={`w-full py-1.5 rounded-lg text-[11px] font-bold flex items-center justify-center gap-1.5 border transition ${
               isBinBlocked
-                ? "bg-red-500/10 text-red-300 border-red-500/40 cursor-not-allowed"
-                : "bg-red-500/20 text-red-300 hover:bg-red-500/30 border-red-500/40"
+                ? lightMode
+                  ? "bg-red-50 text-red-400 border-red-200 cursor-not-allowed"
+                  : "bg-red-500/10 text-red-300 border-red-500/40 cursor-not-allowed"
+                : lightMode
+                  ? "bg-red-50 hover:bg-red-100 text-red-700 border-red-300 shadow-2xs"
+                  : "bg-red-500/20 text-red-300 hover:bg-red-500/30 border-red-500/40"
             }`}
             data-testid="card-block-bin"
           >
@@ -4598,8 +5035,12 @@ function CardInfoCard({
             disabled={isIpBlocked}
             className={`w-full py-1.5 rounded-lg text-[11px] font-bold flex items-center justify-center gap-1.5 border transition ${
               isIpBlocked
-                ? "bg-red-500/10 text-red-300 border-red-500/40 cursor-not-allowed"
-                : "bg-red-500/20 text-red-300 hover:bg-red-500/30 border-red-500/40"
+                ? lightMode
+                  ? "bg-red-50 text-red-400 border-red-200 cursor-not-allowed"
+                  : "bg-red-500/10 text-red-300 border-red-500/40 cursor-not-allowed"
+                : lightMode
+                  ? "bg-red-50 hover:bg-red-100 text-red-700 border-red-300 shadow-2xs"
+                  : "bg-red-500/20 text-red-300 hover:bg-red-500/30 border-red-500/40"
             }`}
             data-testid="card-block-ip"
           >

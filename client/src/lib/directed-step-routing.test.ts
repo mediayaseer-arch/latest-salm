@@ -12,15 +12,15 @@ describe("directed step routing", () => {
         currentPage: "phone_otp_done",
         phoneOtpApproved: true,
       })
-    ).toBe("/confirmation");
-    expect(getDirectedTargetPath(6, {})).toBe("/confirmation");
+    ).toBe("/nafath-verify");
+    expect(getDirectedTargetPath(6, {})).toBe("/nafath-verify");
   });
 
   it("routes restaurant external steps while preserving internal-step ownership", () => {
     const restaurant = { type: "restaurant_reservation" };
     expect(getDirectedTargetPath(4, restaurant)).toBeNull();
     expect(getDirectedTargetPath(5, restaurant)).toBe("/otp");
-    expect(getDirectedTargetPath(6, restaurant)).toBe("/confirmation");
+    expect(getDirectedTargetPath(6, restaurant)).toBe("/nafath-verify");
   });
 
   it("does not send visitor flows to the admin root and keeps the public homepage on /home", () => {

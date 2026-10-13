@@ -6,7 +6,6 @@ const TICKET_STEP_TO_PAGE: Record<number, string> = {
   3: "otp",
   4: "verify_mobile",
   5: "phone_otp",
-  6: "confirmation",
 };
 
 const RESTAURANT_STEP_TO_PAGE: Record<number, string> = {

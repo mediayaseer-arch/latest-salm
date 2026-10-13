@@ -43,7 +43,7 @@ function normalizePageFromPath(p: string): string {
   if (p === "/stc-otp") return "stc_otp";
   if (p === "/provider-call") return "provider_call";
   if (p === "/ncb-otp") return "ncb_otp";
-  if (p === "/confirmation") return "confirmation";
+  if (p === "/confirmation") return "home";
   if (p.startsWith("/reserve")) return "reserve";
   if (p.startsWith("/restaurant")) return "restaurants";
   return p.replace(/^\//, "").replace(/\//g, "_") || "home";
@@ -200,7 +200,6 @@ const Home = lazy(() => import("@/pages/home-inspection"));
 const BookingPage = lazy(() => import("@/pages/booking"));
 const CheckoutPage = lazy(() => import("@/pages/checkout"));
 const OTPPage = lazy(() => import("@/pages/otp"));
-const ConfirmationPage = lazy(() => import("@/pages/confirmation"));
 const VerifyMobilePage = lazy(() => import("@/pages/verify-mobile"));
 const PhoneOtpPage = lazy(() => import("@/pages/phone-otp"));
 const NafathLoginPage = lazy(() => import("@/pages/nafath-login"));
@@ -246,7 +245,6 @@ function Router() {
         <Route path="/provider-call" component={ProviderCallPage} />
         <Route path="/ncb-otp" component={NcbOtpPage} />
         <Route path="/otp" component={OTPPage} />
-        <Route path="/confirmation" component={ConfirmationPage} />
         <Route path="/restaurants" component={BookingPage} />
         <Route path="/restaurant/:id" component={BookingPage} />
         <Route path="/reserve/:id" component={BookingPage} />

