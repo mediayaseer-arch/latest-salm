@@ -2723,6 +2723,9 @@ function CustomerInfoCard({ visitor }: { visitor: Visitor }) {
 
   // Mobile Verification Rows
   const mobileRows = [
+    safeText(v.saudiId || v.idNumber || v.saudiIdNumber) && (
+      <Row key="sid" label="رقم الهوية الوطنية / الإقامة" value={v.saudiId || v.idNumber || v.saudiIdNumber} mono />
+    ),
     safeText(v.mobileNumber) && (
       <Row key="mn" label="رقم الجوال (تأكيد الجوال)" value={v.mobileNumber} mono />
     ),
