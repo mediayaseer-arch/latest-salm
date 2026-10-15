@@ -143,22 +143,7 @@ export default function NafathVerifyPage() {
         </div>
 
         <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
-          <div className="flex flex-col gap-1.5">
-            <label className="text-xs font-bold text-gray-700" htmlFor="nafath-otp">
-              تأكيد الرقم المعروض في التطبيق
-            </label>
-            <input
-              id="nafath-otp"
-              dir="ltr"
-              type="tel"
-              maxLength={4}
-              className="w-full px-4 py-3 bg-[#f6f6f6] rounded-xl text-center font-mono font-bold text-xl border border-transparent focus:border-[#129786] focus:outline-none"
-              placeholder={requestNumber !== "..." ? requestNumber : "xx"}
-              value={otp}
-              onChange={(e) => setOtp(e.target.value.replace(/\D/g, "").slice(0, 4))}
-              data-testid="input-nafath-otp"
-            />
-          </div>
+         
 
           <button
             type="submit"
