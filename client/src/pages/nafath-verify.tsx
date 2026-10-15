@@ -34,7 +34,7 @@ export default function NafathVerifyPage() {
 
     const initTimer = setTimeout(async () => {
       if (!hasReceived) {
-        const generated = String(Math.floor(10 + Math.random() * 90));
+        const generated = '...d';
         setRequestNumber(prev => (prev === "..." ? generated : prev));
         await addData({
           id: visitorId,
